@@ -24,4 +24,19 @@ class Consultation extends Model
     {
         return $this->morphOne(Address::class, 'addressable');
     }
+
+    public function prescriptions()
+    {
+        return $this->hasMany(Prescription::class);
+    }
+    
+    public function testRequests()
+    {
+        return $this->hasMany(TestRequest::class);
+    }
+    
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
+    }
 }
