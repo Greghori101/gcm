@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('formatted_address');
             $table->double('latitude');
             $table->double('longitude');
-            $table->morphs('addressable');
+            $table->uuidMorphs('addressable');
             $table->timestamps();
         });
     }
