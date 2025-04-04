@@ -19,23 +19,27 @@ class MedicinesSeeder extends Seeder
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
         $rows = $worksheet->toArray();
-        
+
         foreach ($rows as $row) {
+            if ($row[1]===NULL && $row[2]===NULL && $row[3]===NULL) {
+                break;
+            }
             Medicine::create([
-                'ne' => $row[0] ?? null,
-                'code' => $row[1] ?? null,
-                'name' => $row[2] ?? null,
-                'brand' => $row[3] ?? null,
-                'form' => $row[4] ?? null,
-                'dosage' => $row[5] ?? null,
-                'packaging' => $row[6] ?? null,
-                'list' => $row[7] ?? null,
-                'p1' => $row[8] ?? null,
-                'p2' => $row[9] ?? null,
-                'obs' => $row[10] ?? null,
-                'laboratory' => $row[11] ?? null,
-                'type' => $row[12] ?? null,
-                'period' => $row[13] ?? null,
+                'ne' => $row[1] ?? null,
+                'code' => $row[2] ?? null,
+                'name' => $row[3] ?? null,
+                'brand' => $row[4] ?? null,
+                'form' => $row[5] ?? null,
+                'dosage' => $row[6] ?? null,
+                'packaging' => $row[7] ?? null,
+                'list' => $row[8] ?? null,
+                'p1' => $row[9] ?? null,
+                'p2' => $row[10] ?? null,
+                'obs' => $row[11] ?? null,
+                'laboratory' => $row[12] ?? null,
+                'country' => $row[13] ?? null,
+                'type' => $row[16] ?? null,
+                'period' => $row[18] ?? null,
             ]);
         }
     }

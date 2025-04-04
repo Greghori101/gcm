@@ -65,6 +65,11 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasName, H
         return $this->morphOne(Address::class, 'addressable');
     }
 
+    public function patient()
+    {
+        return $this->hasOne(Patient::class);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return true;

@@ -12,18 +12,19 @@ class Certificate extends Model
 
     protected $fillable = [
         'nb',
-        'date',
         'period',
         'signature',
+    'date',
+        'purpose',
     ];
-
-    public function address()
-    {
-        return $this->morphOne(Address::class, 'addressable');
-    }
 
     public function  patient()
     {
         return $this->belongsTo(Patient::class);
+    }
+
+    public function address()
+    {
+        return $this->morphOne(Address::class, 'addressable');
     }
 }

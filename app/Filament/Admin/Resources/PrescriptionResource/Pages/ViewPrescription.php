@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\PrescriptionResource\Pages;
 
 use App\Filament\Admin\Resources\PrescriptionResource;
+use App\Models\Prescription;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -14,6 +15,12 @@ class ViewPrescription extends ViewRecord
     {
         return [
             Actions\EditAction::make(),
+            Actions\Action::make('pdf')
+                ->label('PDF')
+                ->color('success')
+                ->icon('heroicon-o-document-download')
+                ->url(fn(Prescription $record) => route('pdf', $record))
+                ->openUrlInNewTab(),
         ];
     }
 }

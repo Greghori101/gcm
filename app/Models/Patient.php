@@ -27,4 +27,19 @@ class Patient extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function prescriptions()
+    {
+        return $this->hasMany(Prescription::class);
+    }
+    
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
+    }
+    
+    public function testRequests()
+    {
+        return $this->hasMany(TestRequest::class);
+    }
 }

@@ -2,6 +2,12 @@
 
 namespace App\Filament\Admin\Resources;
 
+use App\Enums\BloodTypes;
+use App\Enums\Genders;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Patient;
+use Carbon\Carbon;
 use App\Filament\Admin\Resources\TestRequestResource\Pages;
 use App\Filament\Admin\Resources\TestRequestResource\RelationManagers;
 use App\Models\TestRequest;
@@ -25,11 +31,6 @@ class TestRequestResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nb')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\DatePicker::make('date')
-                    ->required(),
                 Forms\Components\Textarea::make('past_medical_history')
                     ->required()
                     ->columnSpanFull(),
@@ -42,9 +43,47 @@ class TestRequestResource extends Resource
                 Forms\Components\Textarea::make('requests')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('patient_id')
-                    ->maxLength(36)
-                    ->default(null),
+                    Forms\Components\DatePicker::make('date')
+                    ->default(Carbon::today())
+                    ->required(),
+                Forms\Components\Textarea::make('purpose')
+                    ->required(),
+                Forms\Components\Select::make('patient_id')
+                    ->relationship('patient', 'id')
+                    ->preload()
+                    ->required()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('firstname')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('lastname')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\DatePicker::make('birthdate')
+                            ->required(),
+                        Forms\Components\TextInput::make('phone_number')
+                            ->tel()
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Select::make('blood_type')
+                            ->options(BloodTypes::toArray())
+                            ->required(),
+                        Forms\Components\Select::make('gender')
+                            ->options(Genders::toArray())
+                            ->required(),
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->maxLength(255),
+                    ])
+                    ->createOptionUsing(function (array $data): string {
+                        $data['password'] =  Hash::make('password');
+                        $user = User::create($data);
+                        $patient = Patient::create([]);
+                        $user->patient()->save($patient);
+                        return $patient->getKey();
+                    }),
+            
             ]);
     }
 
@@ -82,6 +121,12 @@ class TestRequestResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('pdf')
+                    ->label('PDF')
+                    ->color('success')
+                    ->icon('heroicon-o-document-download')
+                    ->url(fn(TestRequest $record) => route('test-request-pdf', $record))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

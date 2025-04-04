@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->uuid('id');
-            $table->unsignedBigInteger('nb');
+            $table->bigIncrements('nb')->unique();
             $table->string('period');
-            $table->date('date');
             $table->string('signature');
-            $table->foreignUuid('patient_id')->nullable()->index();
+            $table->date('date');
+            $table->string('purpose');
+           $table->foreignUuid('patient_id')->nullable()->index();
             $table->timestamps();
         });
     }

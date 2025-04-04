@@ -13,27 +13,34 @@ class Prescription extends Model
     protected $fillable = [
         'nb',
         'date',
+        'purpose',
     ];
-
-    public function address()
-    {
-        return $this->morphOne(Address::class, 'addressable');
-    }
 
     public function  patient()
     {
         return $this->belongsTo(Patient::class);
     }
 
+    public function address()
+    {
+        return $this->morphOne(Address::class, 'addressable');
+    }
+
     public function  medicines()
     {
-        return $this->belongsToMany(Medicine::class)->with([
-            'form',
-            'dosage',
-            'quantity',
-            'unit',
-            'posology',
-            'conditions',
-        ]);
+        return $this->belongsToMany(Medicine::class, 'prescription_medicine')
+            ->using(PrescriptionMedicine::class)
+            ->withPivot([
+                'is_qsp',
+                'quantity',
+                'unit',
+                'posology',
+                'conditions',
+            ]);
+    }
+
+    public function prescriptionMedicines()
+    {
+        return $this->hasMany(PrescriptionMedicine::class);
     }
 }

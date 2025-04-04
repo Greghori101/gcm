@@ -23,19 +23,26 @@ class Medicine extends Model
         'p2',
         'obs',
         'laboratory',
+        'country',
         'type',
         'period',
     ];
 
     public function  prescriptions()
     {
-        return $this->belongsToMany(Prescription::class)->with([
-            'form',
-            'dosage',
-            'quantity',
-            'unit',
-            'posology',
-            'conditions',
-        ]);
+        return $this->belongsToMany(Prescription::class, 'prescription_medicine')
+            ->using(PrescriptionMedicine::class)
+            ->withPivot([
+                'is_qsp',
+                'quantity',
+                'unit',
+                'posology',
+                'conditions',
+            ]);
+    }
+
+    public function prescriptionMedicines()
+    {
+        return $this->hasMany(PrescriptionMedicine::class);
     }
 }

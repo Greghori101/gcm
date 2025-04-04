@@ -17,16 +17,17 @@ return new class extends Migration
             $table->string('code');
             $table->string('name');
             $table->string('brand');
-            $table->string('form');
-            $table->string('dosage');
-            $table->string('packaging');
-            $table->string('list');
-            $table->string('p1');
-            $table->string('p2');
-            $table->string('obs');
-            $table->string('laboratory');
-            $table->string('type');
-            $table->string('period');
+            $table->string('form')->nullable();
+            $table->text('dosage')->nullable();
+            $table->text('packaging')->nullable();
+            $table->string('list')->nullable();
+            $table->string('p1')->nullable();
+            $table->string('p2')->nullable();
+            $table->text('obs')->nullable();
+            $table->text('laboratory')->nullable();
+            $table->string('type')->nullable();
+            $table->string('period')->nullable();
+            $table->string('country')->nullable();
             $table->timestamps();
         });
     }

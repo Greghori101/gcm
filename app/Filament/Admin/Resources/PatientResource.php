@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources;
 
+use App\Enums\BloodTypes;
+use App\Enums\Genders;
 use App\Filament\Admin\Resources\PatientResource\Pages;
 use App\Filament\Admin\Resources\PatientResource\RelationManagers;
 use App\Models\Patient;
@@ -25,32 +27,32 @@ class PatientResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('firstname')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('lastname')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('birthdate')
-                    ->required(),
-                Forms\Components\TextInput::make('phone_number')
-                    ->tel()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('blood_type')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('gender')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('birth_place')
-                    ->required(),
-                Forms\Components\Select::make('address')
-                    ->required(),
+                Forms\Components\Grid::make()->columns(2)->schema([
+                    Forms\Components\TextInput::make('firstname')
+                        ->required()
+                        ->maxLength(255)
+                        ->columnSpan(1),
+                    Forms\Components\TextInput::make('lastname')
+                        ->required()
+                        ->maxLength(255)
+                        ->columnSpan(1),
+                    Forms\Components\DatePicker::make('birthdate')
+                        ->required()
+                        ->columnSpan(1),
+                    Forms\Components\TextInput::make('phone_number')
+                        ->tel()
+                        ->required()
+                        ->maxLength(255)
+                        ->columnSpan(1),
+                    Forms\Components\Select::make('blood_type')
+                        ->options(BloodTypes::toArray())
+                        ->required()
+                        ->columnSpan(1),
+                    Forms\Components\Select::make('gender')
+                        ->options(Genders::toArray())
+                        ->required()
+                        ->columnSpan(1),
+                ])
             ]);
     }
 

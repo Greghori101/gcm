@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('prescription_medicine', function (Blueprint $table) {
             $table->id();
-            $table->string('form');
-            $table->string('dosage');
+            $table->boolean('is_qsp');
             $table->unsignedBigInteger('quantity');
             $table->string('unit');
             $table->string('posology');
             $table->json('conditions');
-            $table->foreignUuid('patient_id')->nullable()->index();
+            $table->foreignUuid('prescription_id')->nullable()->index();
+            $table->foreignUuid('medicine_id')->nullable()->index();
             $table->timestamps();
         });
     }

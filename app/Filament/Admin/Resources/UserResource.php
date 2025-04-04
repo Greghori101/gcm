@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources;
 
+use App\Enums\BloodTypes;
+use App\Enums\Genders;
 use App\Filament\Admin\Resources\UserResource\Pages;
 use App\Filament\Admin\Resources\UserResource\RelationManagers;
 use App\Models\User;
@@ -39,12 +41,12 @@ class UserResource extends Resource
                     ->tel()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('blood_type')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('gender')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Select::make('blood_type')
+                    ->options(BloodTypes::toArray())
+                    ->required(),
+                Forms\Components\Select::make('gender')
+                    ->options(Genders::toArray())
+                    ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()

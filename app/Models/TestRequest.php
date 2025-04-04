@@ -12,20 +12,21 @@ class TestRequest extends Model
 
     protected $fillable = [
         'nb',
-        'date',
         'past_medical_history',
         'visit_purpose',
         'conclusion',
         'requests',
+    'date',
+        'purpose',
     ];
-
-    public function address()
-    {
-        return $this->morphOne(Address::class, 'addressable');
-    }
 
     public function  patient()
     {
         return $this->belongsTo(Patient::class);
+    }
+
+    public function address()
+    {
+        return $this->morphOne(Address::class, 'addressable');
     }
 }

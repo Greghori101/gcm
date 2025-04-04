@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('test_requests', function (Blueprint $table) {
             $table->uuid('id');
-            $table->unsignedBigInteger('nb');
-            $table->date('date');
+            $table->bigIncrements('nb')->unique();
             $table->json('past_medical_history');
             $table->string('visit_purpose');
             $table->string('conclusion');
             $table->json('requests');
+            $table->date('date');
+            $table->string('purpose');
             $table->foreignUuid('patient_id')->nullable()->index();
             $table->timestamps();
         });

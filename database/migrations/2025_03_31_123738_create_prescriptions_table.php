@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('prescriptions', function (Blueprint $table) {
             $table->uuid('id');
-            $table->unsignedBigInteger('nb');
+            $table->bigIncrements('nb')->unique();
             $table->date('date');
-            $table->foreignUuid('patient_id')->nullable()->index();
+            $table->string('purpose');
+           $table->foreignUuid('patient_id')->nullable()->index();
             $table->timestamps();
         });
     }
