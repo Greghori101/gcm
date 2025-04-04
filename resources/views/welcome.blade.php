@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <header class="bg-white shadow-md py-4 px-6 flex items-center justify-between">
+    <header class="bg-white shadow-md py-2 px-6 flex items-center justify-between">
         <!-- Logo on the left -->
         
         <div class="flex flex-row items-center justify-center gap-2">
