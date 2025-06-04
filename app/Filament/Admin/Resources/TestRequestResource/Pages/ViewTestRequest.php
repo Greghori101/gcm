@@ -18,7 +18,7 @@ class ViewTestRequest extends ViewRecord
             Actions\Action::make('pdf')
                 ->label('PDF')
                 ->color('success')
-                ->icon('heroicon-o-document-download')
+                ->icon('heroicon-o-document-arrow-down')
                 ->url(fn(TestRequest $record) => route('test-request-pdf', $record))
                 ->openUrlInNewTab(),
         ];

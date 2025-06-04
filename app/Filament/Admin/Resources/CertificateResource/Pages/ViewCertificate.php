@@ -18,7 +18,7 @@ class ViewCertificate extends ViewRecord
             Actions\Action::make('pdf')
                 ->label('PDF')
                 ->color('success')
-                ->icon('heroicon-o-document-download')
+                ->icon('heroicon-o-document-arrow-down')
                 ->url(fn(Certificate $record) => route('certificate-pdf', $record))
                 ->openUrlInNewTab(),
         ];

@@ -18,8 +18,8 @@ class ViewPrescription extends ViewRecord
             Actions\Action::make('pdf')
                 ->label('PDF')
                 ->color('success')
-                ->icon('heroicon-o-document-download')
-                ->url(fn(Prescription $record) => route('pdf', $record))
+                ->icon('heroicon-o-document-arrow-down')
+                ->url(fn(Prescription $record) => route('prescription-pdf', $record))
                 ->openUrlInNewTab(),
         ];
     }

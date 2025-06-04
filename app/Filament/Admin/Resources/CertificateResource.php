@@ -37,7 +37,7 @@ class CertificateResource extends Resource
                 Forms\Components\TextInput::make('signature')
                     ->required()
                     ->maxLength(255),
-                    Forms\Components\DatePicker::make('date')
+                Forms\Components\DatePicker::make('date')
                     ->default(Carbon::today())
                     ->required(),
                 Forms\Components\Textarea::make('purpose')
@@ -77,7 +77,7 @@ class CertificateResource extends Resource
                         $user->patient()->save($patient);
                         return $patient->getKey();
                     }),
-            
+
             ]);
     }
 
@@ -118,7 +118,7 @@ class CertificateResource extends Resource
                 Tables\Actions\Action::make('pdf')
                     ->label('PDF')
                     ->color('success')
-                    ->icon('heroicon-o-document-download')
+                    ->icon('heroicon-o-document-arrow-down')
                     ->url(fn(Certificate $record) => route('certificate-pdf', $record))
                     ->openUrlInNewTab(),
             ])

@@ -43,7 +43,7 @@ class TestRequestResource extends Resource
                 Forms\Components\Textarea::make('requests')
                     ->required()
                     ->columnSpanFull(),
-                    Forms\Components\DatePicker::make('date')
+                Forms\Components\DatePicker::make('date')
                     ->default(Carbon::today())
                     ->required(),
                 Forms\Components\Textarea::make('purpose')
@@ -83,7 +83,7 @@ class TestRequestResource extends Resource
                         $user->patient()->save($patient);
                         return $patient->getKey();
                     }),
-            
+
             ]);
     }
 
@@ -124,7 +124,7 @@ class TestRequestResource extends Resource
                 Tables\Actions\Action::make('pdf')
                     ->label('PDF')
                     ->color('success')
-                    ->icon('heroicon-o-document-download')
+                    ->icon('heroicon-o-document-arrow-down')
                     ->url(fn(TestRequest $record) => route('test-request-pdf', $record))
                     ->openUrlInNewTab(),
             ])
