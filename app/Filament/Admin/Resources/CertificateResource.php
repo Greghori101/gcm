@@ -55,10 +55,9 @@ class CertificateResource extends Resource
                             ->maxLength(255),
                         Forms\Components\DatePicker::make('birthdate')
                             ->required(),
-                        Forms\Components\TextInput::make('phone_number')
-                            ->tel()
+                        Forms\Components\TagsInput::make('phone_number')
                             ->required()
-                            ->maxLength(255),
+                            ->separator(','),
                         Forms\Components\Select::make('blood_type')
                             ->options(BloodTypes::toArray())
                             ->required(),

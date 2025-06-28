@@ -64,10 +64,9 @@ class PatientForm extends Forms\Components\Field
                 Forms\Components\DatePicker::make('birthdate')
                     ->required()
                     ->columnSpan(1),
-                Forms\Components\TextInput::make('phone_number')
-                    ->tel()
+                Forms\Components\TagsInput::make('phone_number')
                     ->required()
-                    ->maxLength(255)
+                    ->separator(',')
                     ->columnSpan(1),
                 Forms\Components\Select::make('blood_type')
                     ->options(BloodTypes::toArray())
@@ -93,7 +92,7 @@ class PatientForm extends Forms\Components\Field
                 'firstname' => null,
                 'lastname' => null,
                 'birthdate' => null,
-                'phone_number' => null,
+                'phone_number' => [],
                 'blood_type' => null,
                 'gender' => null,
             ]);

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->json('requests');
             $table->date('date');
             $table->string('purpose');
+            $table->foreignUuid('doctor_id')->nullable()->index();
             $table->foreignUuid('patient_id')->nullable()->index();
             $table->timestamps();
         });

@@ -50,10 +50,23 @@ class PrescriptionResource extends Resource
                                     Forms\Components\Select::make('medicine_id')
                                         ->relationship('medicine', 'name')
                                         ->required()
-                                        ->searchable(['name', 'brand'])
+                                        ->searchable(['name', 'brand', 'dosage'])
+
+                                        ->getSearchResultsUsing(function (string $search) {
+                                            return \App\Models\Medicine::query()
+                                                ->select('id', 'name', 'brand', 'dosage')
+                                                ->whereRaw("CONCAT(brand, ' ', name, ' ', dosage) LIKE ?", ["%{$search}%"])
+                                                ->limit(10)
+                                                ->get()
+                                                ->mapWithKeys(fn($item) => [
+                                                    $item->id => "{$item->brand} / {$item->name} / {$item->form} / {$item->dosage}"
+                                                ])
+                                                ->toArray();
+                                        })
                                         ->preload()
                                         ->optionsLimit(10)
-                                        ->columnSpan(3),
+                                        ->columnSpan(3)
+                                        ->getOptionLabelFromRecordUsing(fn($record) => "{$record->brand} / {$record->name} / {$record->dosage}"),
                                     Forms\Components\Toggle::make('is_qsp')
                                         ->columnSpan(1)
                                         ->inline(false)
@@ -63,6 +76,23 @@ class PrescriptionResource extends Resource
                                         ->numeric()
                                         ->required(),
                                     Forms\Components\TextInput::make('unit')
+                                        ->columnSpan(1)
+                                        ->required()
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('qte')
+                                        ->numeric()
+                                        ->columnSpan(1)
+                                        ->required()
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('form')
+                                        ->columnSpan(1)
+                                        ->required()
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('frequency')
+                                        ->columnSpan(1)
+                                        ->required()
+                                        ->maxLength(255),
+                                    Forms\Components\TextInput::make('periodicity')
                                         ->columnSpan(1)
                                         ->required()
                                         ->maxLength(255),

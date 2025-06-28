@@ -10,27 +10,32 @@
 
 <body class="bg-gray-50 overflow-x-hidden">
     <!-- Header -->
-    <header class="bg-white shadow-md py-4 px-6 flex items-center justify-between relative z-20">
-        <!-- Logo on the left -->
-        <div class="flex flex-row items-center justify-center gap-2">
-            <x-filament-panels::logo />
-            <h4 class="text-lg font-semibold text-gray-800">{{config('app.name')}}</h4>
-        </div>
+    <nav class="py-4 px-8 sticky top-0 z-20">
+        <header class="bg-sky-200/10 border-white/20 backdrop-blur-md shadow-md py-4 px-6 flex items-center justify-between relative rounded-lg">
+            <!-- Logo on the left -->
+            <div class="flex flex-row items-center justify-center gap-2">
+                <x-filament-panels::logo />
+                <h4 class="text-lg font-semibold text-gray-800">{{config('app.name')}}</h4>
+            </div>
+            <!-- Auth buttons on the right -->
+            <div>
+                @auth
+                <!-- Dashboard button -->
+                <a href="{{ url('/admin') }}"
+                    class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all inline-block">
+                    Dashboard
+                </a>
+                @else
+                <!-- Login button -->
+                <a href="{{ url('/admin/login') }}"
+                    class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all inline-block">
+                    Login
+                </a>
+                @endauth
+            </div>
+        </header>
+    </nav>
 
-        <!-- Auth buttons on the right -->
-        <div>
-            @auth
-            <!-- Filament user avatar -->
-            <x-filament-panels::user-menu />
-            @else
-            <!-- Login button -->
-            <a href="{{ url('/admin/login') }}"
-                class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all inline-block">
-                Login
-            </a>
-            @endauth
-        </div>
-    </header>
 
     <!-- Hero Section -->
     <section class="relative h-dvh max-h-dvh flex items-center  overflow-visible">

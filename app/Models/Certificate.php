@@ -14,13 +14,17 @@ class Certificate extends Model
         'nb',
         'period',
         'signature',
-    'date',
+        'date',
         'purpose',
     ];
 
     public function  patient()
     {
         return $this->belongsTo(Patient::class);
+    }
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
     }
 
     public function address()

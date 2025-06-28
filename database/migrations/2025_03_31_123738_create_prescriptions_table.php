@@ -16,7 +16,8 @@ return new class extends Migration
             $table->bigIncrements('nb')->unique();
             $table->date('date');
             $table->string('purpose');
-           $table->foreignUuid('patient_id')->nullable()->index();
+            $table->foreignUuid('doctor_id')->nullable()->index();
+            $table->foreignUuid('patient_id')->nullable()->index();
             $table->timestamps();
         });
     }

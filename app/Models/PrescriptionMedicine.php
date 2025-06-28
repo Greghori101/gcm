@@ -8,6 +8,19 @@ class PrescriptionMedicine extends Pivot
 {
     protected $table = 'prescription_medicine';
 
+    protected $fillable = [
+        'is_qsp',
+        'quantity',
+        'unit',
+        'form',
+        'dosage',
+        'frequency',
+        'periodicity',
+        'conditions',
+        'prescription_id',
+        'medicine_id',
+    ];
+
     protected $casts = [
         'conditions' => 'array',
     ];

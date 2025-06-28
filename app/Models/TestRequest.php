@@ -16,10 +16,13 @@ class TestRequest extends Model
         'visit_purpose',
         'conclusion',
         'requests',
-    'date',
+        'date',
         'purpose',
     ];
-
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
     public function  patient()
     {
         return $this->belongsTo(Patient::class);

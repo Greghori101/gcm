@@ -57,6 +57,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasName, H
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'phone_number' => 'array',
         ];
     }
 

@@ -9,7 +9,10 @@ class Nurse extends Model
 {
     //
     use HasUuids;
-
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
     public function user()
     {
         return $this->belongsTo(User::class);

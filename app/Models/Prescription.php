@@ -14,8 +14,12 @@ class Prescription extends Model
         'nb',
         'date',
         'purpose',
+        'diagnostic',
     ];
-
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
     public function  patient()
     {
         return $this->belongsTo(Patient::class);

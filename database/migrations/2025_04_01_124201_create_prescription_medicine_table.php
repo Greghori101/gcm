@@ -16,7 +16,10 @@ return new class extends Migration
             $table->boolean('is_qsp');
             $table->unsignedBigInteger('quantity');
             $table->string('unit');
-            $table->string('posology');
+            $table->string('form');
+            $table->string('dosage');
+            $table->string('frequency');
+            $table->string('periodicity');
             $table->json('conditions');
             $table->foreignUuid('prescription_id')->nullable()->index();
             $table->foreignUuid('medicine_id')->nullable()->index();
