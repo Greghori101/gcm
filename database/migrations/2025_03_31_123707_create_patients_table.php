@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('patients', function (Blueprint $table) {
-            $table->uuid('id');
+            $table->uuid('id')->primary()->unique();
             $table->json('conditions')->nullable();
             $table->foreignUuid('user_id')->nullable()->index();
             $table->timestamps();
