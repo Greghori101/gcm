@@ -35,8 +35,12 @@ class Medicine extends Model
             ->withPivot([
                 'is_qsp',
                 'quantity',
+                'qte',
                 'unit',
-                'posology',
+                'form',
+                'dosage',
+                'frequency',
+                'periodicity',
                 'conditions',
             ]);
     }

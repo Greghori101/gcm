@@ -11,9 +11,6 @@ class Address extends Model
     use HasUuids;
 
     protected $fillable = [
-        'latitude',
-        'longitude',
-        'formatted_address',
         'country',
         'state',
         'commune',

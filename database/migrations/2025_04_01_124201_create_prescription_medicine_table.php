@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->boolean('is_qsp');
             $table->unsignedBigInteger('quantity');
+            $table->unsignedBigInteger('qte');
             $table->string('unit');
             $table->string('form');
             $table->string('dosage');
             $table->string('frequency');
             $table->string('periodicity');
-            $table->json('conditions');
+            $table->json('conditions')->nullable();
             $table->foreignUuid('prescription_id')->nullable()->index();
             $table->foreignUuid('medicine_id')->nullable()->index();
             $table->timestamps();

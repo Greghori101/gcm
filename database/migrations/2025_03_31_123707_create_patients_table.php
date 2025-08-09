@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->uuid('id');
-            $table->json('conditions');
+            $table->json('conditions')->nullable();
             $table->foreignUuid('user_id')->nullable()->index();
             $table->timestamps();
         });

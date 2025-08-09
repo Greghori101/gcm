@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('doctors', function (Blueprint $table) {
             $table->uuid('id');
-            $table->string('specialty');
+            $table->text('specialty');
             $table->string('national_order_number');
             $table->foreignUuid('user_id')->nullable()->index();
             $table->timestamps();

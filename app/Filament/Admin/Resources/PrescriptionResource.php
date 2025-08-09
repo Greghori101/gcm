@@ -6,9 +6,12 @@ use Carbon\Carbon;
 use App\Filament\Admin\Resources\PrescriptionResource\Pages;
 use App\Filament\Admin\Resources\PrescriptionResource\RelationManagers;
 use App\Forms\Components\PatientForm;
+use App\Models\Medicine;
 use App\Models\Prescription;
+use App\Models\Form as FormModel;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -63,46 +66,71 @@ class PrescriptionResource extends Resource
                                                 ])
                                                 ->toArray();
                                         })
+                                        ->afterStateUpdated(function ($set, Get $get) {
+                                            $dosage = $get('medicine_id') ? Medicine::find($get('medicine_id'))?->dosage : '';
+                                            $set('dosage', $dosage);
+                                        })
                                         ->preload()
                                         ->optionsLimit(10)
                                         ->columnSpan(3)
-                                        ->getOptionLabelFromRecordUsing(fn($record) => "{$record->brand} / {$record->name} / {$record->dosage}"),
+                                        ->getOptionLabelFromRecordUsing(fn($record) => "{$record->brand} / {$record->name} / {$record->form} / {$record->dosage}")
+                                        ->reactive(),
                                     Forms\Components\Toggle::make('is_qsp')
                                         ->columnSpan(1)
                                         ->inline(false)
-                                        ->required(),
+                                        ->required()
+                                        ->reactive(),
                                     Forms\Components\TextInput::make('quantity')
                                         ->columnSpan(1)
                                         ->numeric()
                                         ->required(),
+                                    Forms\Components\Hidden::make('dosage'),
                                     Forms\Components\TextInput::make('unit')
                                         ->columnSpan(1)
                                         ->required()
-                                        ->maxLength(255),
+                                        ->maxLength(255)
+                                        ->hidden(fn(Get $get) => $get('is_qsp')),
+                                    Forms\Components\Select::make('unit')
+                                        ->options(['days' => 'days', 'months' => 'months', 'weeks' => 'weeks',])
+                                        ->columnSpan(1)
+                                        ->required()
+                                        ->hidden(fn(Get $get) => !$get('is_qsp')),
                                     Forms\Components\TextInput::make('qte')
                                         ->numeric()
                                         ->columnSpan(1)
                                         ->required()
                                         ->maxLength(255),
-                                    Forms\Components\TextInput::make('form')
+                                    Forms\Components\Select::make('form')
+                                        ->options(function (Get $get) {
+                                            $medicine = Medicine::find($get('medicine_id'));
+                                            if (!$medicine) {
+                                                return [];
+                                            }
+                                            $notations = FormModel::where('form', $medicine->form)->first()?->notations ?? [];
+                                            // Ensure $notations is always an array
+                                            if (is_string($notations)) {
+                                                $notations = explode(',', $notations);
+                                            }
+                                            if (!is_array($notations)) {
+                                                $notations = [];
+                                            }
+                                            // Return as associative array for Filament Select
+                                            return collect($notations)
+                                                ->mapWithKeys(fn($item) => [$item => $item])
+                                                ->toArray();
+                                        })
                                         ->columnSpan(1)
-                                        ->required()
-                                        ->maxLength(255),
+                                        ->required(),
                                     Forms\Components\TextInput::make('frequency')
                                         ->columnSpan(1)
                                         ->required()
                                         ->maxLength(255),
-                                    Forms\Components\TextInput::make('periodicity')
+                                    Forms\Components\Select::make('periodicity')
+                                        ->options(['day' => 'day', 'month' => 'month', 'week' => 'week',])
                                         ->columnSpan(1)
-                                        ->required()
-                                        ->maxLength(255),
-                                    Forms\Components\TextInput::make('posology')
-                                        ->columnSpan(1)
-                                        ->required()
-                                        ->maxLength(255),
+                                        ->required(),
                                     Forms\Components\TagsInput::make('conditions')
                                         ->columnSpan(2)
-                                        ->required()
                                         ->separator(','),
                                 ])
                                 ->columns(3)

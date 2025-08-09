@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Register;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -25,6 +26,10 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->login()
+            ->registration(Register::class)
+            ->passwordReset()
+            ->emailVerification()
+            ->profile()
             ->id('admin')
             ->path('admin')
             ->colors([
@@ -42,7 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->brandName('GCM')
             ->brandLogo(asset('images/logo.png'))
-            ->brandLogoHeight('2rem')
+            ->brandLogoHeight('3rem')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

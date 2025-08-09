@@ -16,10 +16,13 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Translatable\HasTranslations;
 
 class User extends Authenticatable implements HasMedia, FilamentUser, HasName, HasAvatar
 {
-    use HasFactory, Notifiable, HasUuids, HasRoles, InteractsWithMedia;
+    use HasFactory, Notifiable, HasUuids, HasRoles, InteractsWithMedia, HasTranslations;
+
+    public array $translatable = ['firstname', 'lastname'];
 
     /**
      * The attributes that are mass assignable.

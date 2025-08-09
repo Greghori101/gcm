@@ -1,128 +1,181 @@
 <!DOCTYPE html>
-<html lang="fr" dir="rtl">
+<html lang="fr" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <title>Ordonnance #{{ $record->nb ?? '-' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @vite('resources/css/app.css')
     <style>
         body {
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
+            margin: 0;
             font-size: 14px;
-            padding: 30px;
-            direction: rtl;
         }
-        .title {
-            font-weight: bold;
-            font-size: 20px;
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+        }
+
+        .doctor-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .date-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            gap: 4px;
+        }
+
+        .patient-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 16px;
+            padding: 24px;
+        }
+
+        .prescription-title {
+            font-size: 1.25rem;
+            text-transform: uppercase;
+            text-decoration: underline;
             text-align: center;
-            margin: 20px 0;
+            width: 100%;
+            margin: 16px 0;
         }
-        .section {
-            margin-bottom: 15px;
-        }
-        .flex-between {
+
+        .medication-list {
             display: flex;
+            flex-direction: column;
+            align-items: start;
+            margin-top: 16px;
+            gap: 8px;
+            padding: 32px;
+        }
+
+        .medication-item {
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .medication-first-line {
+            display: flex;
+            flex-grow: 1;
+            align-items: center;
             justify-content: space-between;
         }
-        .left {
-            text-align: left;
-            direction: ltr;
-        }
-        .rtl {
-            text-align: right;
-        }
-        .med-line {
+
+        .medication-second-line {
             display: flex;
-            justify-content: space-between;
-            border-bottom: 1px dashed #999;
-            padding: 4px 0;
+            gap: 2px;
+            flex-grow: 1;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .medication-name {
+            font-weight: bold;
+        }
+
+        .medication-separator {
+            flex-grow: 1;
+            border-top: 1px solid #000;
+            margin: 0 8px;
+        }
+
+        .patient-separator {
+            flex-grow: 1;
+            margin: 0 8px;
+            border-top: 2px dotted #000;
         }
     </style>
 </head>
 
 <body>
-
-    <div class="flex-between">
+    <div class="header">
         {{-- Doctor Info --}}
-        <div class="section w-1/2 rtl">
-            <div class="font-bold text-base">الدكتور مراد حمزة</div>
-            <div>اختصاصي في الأمراض النفسية و العقلية</div>
-            <div>و العلاج النفسي</div>
-            <div>تخطيط الدماغ الكهربائي</div>
-            <div class="mt-2">Cité des 800 logts N°523, BATNA</div>
-            <div>Tel: {{ $record->doctor->user->phone_number[0] ?? '-' }}</div>
-            <div>Email: {{ $record->doctor->user->email ?? '-' }}</div>
-            <div>N° ordre: {{ $record->doctor->national_order_number ?? '-' }}</div>
+
+        <div class="doctor-info" style="font-weight: bold;">
+            <div>{{ __('interface.dr') }}:
+                {{ $record->doctor?->user?->lastname . ' ' . $record->doctor?->user?->firstname }}
+            </div>
+            <div>{{ __('interface.specialty') }}: {{ $record->doctor?->specialty }}</div>
+            <div> {{ $record->doctor?->address?->formatted_address }}</div>
+            <div>{{ __('interface.order_number') }}: {{ $record->doctor?->national_order_number ?? '-' }}</div>
         </div>
 
-        {{-- Patient + Date Info --}}
-        <div class="section w-1/2 left">
-            <div>
-                Batna, le
+        {{-- Date Info --}}
+        <div class="date-info">
+            <span style="font-weight: bold;">
+                {{ __('interface.date') }}
                 {{ $record->date ? \Carbon\Carbon::parse($record->date)->format('d/m/Y') : '-' }}
-            </div>
-            <div>
-                Âge:
-                {{ optional(optional($record->patient)->user)?->birthdate
-                    ? \Carbon\Carbon::parse($record->patient->user->birthdate)->age . ' ans'
-                    : '-' }}
-            </div>
-            <div>
-                Sexe:
-                {{ ucfirst($record->patient->user->gender ?? '-') }}
-            </div>
-            <div>QSP 3 MOIS</div>
+            </span>
+            <span>
+                {{ __('interface.phone_number') }}
+                @php
+                    $phones = $record->doctor?->user?->phone_number;
+                    // Try to decode as JSON if it's a string
+                    if (is_string($phones)) {
+                        $decoded = json_decode($phones, true);
+                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                            $phones = $decoded;
+                        } else {
+                            $phones = empty($phones) ? [] : [$phones];
+                        }
+                    } elseif (!is_array($phones)) {
+                        $phones = empty($phones) ? [] : [$phones];
+                    }
+                @endphp
+                @foreach ($phones as $phone)
+                    <div>{{ $phone }}</div>
+                @endforeach
+            </span>
         </div>
     </div>
-
-    {{-- Prescription Title --}}
-    <div class="title">ORDONNANCE</div>
-
     {{-- Patient Name --}}
-    <div class="section rtl">
-        <div>
-            Nom:
-            <span class="uppercase font-bold">{{ $record->patient->user->lastname ?? '-' }}</span>
-        </div>
-        <div>
-            Prénom:
-            <span class="capitalize">{{ $record->patient->user->firstname ?? '-' }}</span>
-        </div>
+    <div class="patient-info">
+        <span>{{ __('interface.lastname') }}: {{ $record->patient->user?->lastname }}</span>
+        <span class="patient-separator"></span>
+
+        <span>{{ __('interface.firstname') }}: {{ $record->patient->user?->firstname }}</span>
+        <span class="patient-separator"></span>
+
+        <span>{{ __('interface.age') }}: {{ $record->patient->user?->birthdate }}</span>
+    </div>
+    {{-- prescription title --}}
+    <div class="prescription-title">
+        {{ __('interface.prescription_title') }}
     </div>
 
     {{-- Medication Lines --}}
-    <div class="section">
-        @foreach($record->prescriptionMedicines ?? [] as $pm)
-            <div class="med-line">
-                <div>
-                    {{ $pm->medicine->name ?? '-' }}
-                    {{ $pm->medicine->dosage ?? '' }}
-                    {{ $pm->medicine->form ?? '' }}
+    <ol class="medication-list">
+        @foreach ($record->prescriptionMedicines ?? [] as $pm)
+            <li class="medication-item">
+                <div class="medication-first-line">
+                    <span class="medication-name">
+                        {{ $pm->medicine->brand ?? ($pm->medicine->name ?? '-') }} {{ $pm->form ?? '-' }}
+                        <span style="text-transform:lowercase">{{ $pm->dosage ?? '-' }}</span>
+                    </span>
+                    <span class="medication-separator"></span>
+                    <span>
+                        {{ $pm->is_qsp ? 'QSP 0' . $pm->quantity . ' ' . $pm->unit : '0' . $pm->quantity . ' ' . $pm->unit }}
+                    </span>
                 </div>
-                <div class="left">
-                    {{ $pm->posology ?? '-' }}
-                    {{ ($pm->is_qsp ?? false) ? 'QSP ' . ($pm->pivot->periodicity ?? '3 MOIS') : '' }}
+                <div class="medication-second-line">
+                    <span>{{ '0' . $pm->qte . ' ' . $pm->form . ' X ' . $pm->frequency . ' / ' . $pm->periodicity }}</span>
+                    <span>{{ $pm->conditions ? ' ;' . $pm->conditions : '' }}</span>
                 </div>
-            </div>
+            </li>
         @endforeach
-    </div>
-
-    {{-- Signature --}}
-    <div class="section left mt-10">
-        <div class="font-bold">Dr. {{ $record->doctor->user->lastname ?? '-' }}</div>
-        <div class="mt-6">__________________________</div>
-    </div>
-
-    {{-- Pharmacy Stamp --}}
-    <div class="section left mt-10 text-xs">
-        <div class="font-bold uppercase">PHARMACIE MAARIF</div>
-        <div>Batna</div>
-        <div>
-            Tél: {{ $record->doctor->user->phone_number[0] ?? '-' }}
-        </div>
-    </div>
-
+        </ul>
 </body>
+
 </html>

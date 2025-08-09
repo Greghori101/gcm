@@ -11,6 +11,7 @@ class PrescriptionMedicine extends Pivot
     protected $fillable = [
         'is_qsp',
         'quantity',
+        'qte',
         'unit',
         'form',
         'dosage',

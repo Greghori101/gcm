@@ -19,6 +19,8 @@ class PdfController extends Controller
             'prescriptionMedicines.medicine'
         ])->find($id);
 
+
+        return view('prescription-pdf', ['record' => $prescription]);
         return Pdf::loadView('prescription-pdf', ['record' => $prescription])
             ->stream($prescription->nb . '.pdf');
     }
