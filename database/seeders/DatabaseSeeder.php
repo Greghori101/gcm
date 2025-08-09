@@ -18,6 +18,26 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
+        // Control which seeders to run
+        $runDatabaseSeeder = true;
+        $runPlansSeeder = true;
+        $runQueueSeeder = true;
+        $runMedicinesSeeder = true;
+
+        if ($runPlansSeeder) {
+            $this->call(DefaultPlansSeeder::class);
+        }
+        if ($runQueueSeeder) {
+            $this->call(QueueSeeder::class);
+        }
+        if ($runMedicinesSeeder) {
+            $this->call(MedicinesSeeder::class);
+        }
+
+        if (!$runDatabaseSeeder) {
+            return;
+        }
+
         $adminRole = Role::firstOrCreate(['name' => Roles::ADMIN->value]);
 
         // Create a default admin user

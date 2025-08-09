@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use App\Enums\TicketStatus;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Ticket extends Model
 {
+    use HasUuids;
     protected $fillable = [
         'patient_id',
         'queue_id',

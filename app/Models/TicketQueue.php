@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class TicketQueue extends Model
 {
     //
+    use HasUuids;
+
     protected $fillable = ['name', 'priority'];
     public $incrementing = false;
     protected $keyType = 'string';

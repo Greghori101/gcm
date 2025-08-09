@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use App\Enums\SubscriptionStatus;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Subscription extends Model
 {
 
-    use SoftDeletes;
+    use SoftDeletes,HasUuids;
 
     protected $fillable = [
         'user_id',
