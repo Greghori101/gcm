@@ -15,6 +15,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
+use Filament\Forms\Components\Actions\Action as FormsAction;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class PatientResource extends Resource
 {
@@ -58,6 +60,69 @@ class PatientResource extends Resource
                         ->options(Genders::toArray())
                         ->required()
                         ->columnSpan(1),
+                    Forms\Components\Select::make('user_id')
+                        ->label('User')
+                        ->relationship('user', 'email')
+                        ->searchable()
+                        ->options(function () {
+                            return \App\Models\User::whereDoesntHave('doctor')->pluck('email', 'id');
+                        })
+                        ->createOptionForm([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    SpatieMediaLibraryFileUpload::make('avatar')
+                                        ->avatar()
+                                        ->imageEditor()
+                                        ->collection('avatar')
+                                        ->columnSpanFull(),
+                                    TranslatableContainer::make(
+                                        Forms\Components\TextInput::make('firstname')
+                                            ->maxLength(255)
+                                            ->required()
+                                    )
+                                        ->onlyMainLocaleRequired()
+                                        ->requiredLocales(['fr', 'ar'])
+                                        ->columnSpan(1),
+                                    TranslatableContainer::make(
+                                        Forms\Components\TextInput::make('lastname')
+                                            ->maxLength(255)
+                                            ->required()
+                                    )
+                                        ->onlyMainLocaleRequired()
+                                        ->requiredLocales(['fr', 'ar'])
+                                        ->columnSpan(1),
+                                    Forms\Components\DatePicker::make('birthdate')
+                                        ->required()
+                                        ->columnSpan(1),
+                                    Forms\Components\TagsInput::make('phone_number')
+                                        ->required()
+                                        ->separator(',')
+                                        ->columnSpan(1),
+                                    Forms\Components\Select::make('blood_type')
+                                        ->options(BloodTypes::toArray())
+                                        ->required()
+                                        ->columnSpan(1),
+                                    Forms\Components\Select::make('gender')
+                                        ->options(Genders::toArray())
+                                        ->required()
+                                        ->columnSpan(1),
+                                    Forms\Components\TextInput::make('email')
+                                        ->email()
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->columnSpan(1),
+                                    Forms\Components\DateTimePicker::make('email_verified_at')
+                                        ->columnSpan(1),
+                                    Forms\Components\TextInput::make('password')
+                                        ->password()
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->columnSpan(1),
+                                ])
+                        ])
+                        ->createOptionAction(fn(FormsAction $action) => $action->modalWidth('3xl'))
+                        ->required()
+
                 ])
             ]);
     }
