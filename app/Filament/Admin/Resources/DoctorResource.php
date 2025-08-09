@@ -25,9 +25,13 @@ class DoctorResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('specialty')
-                    ->required()
-                    ->maxLength(255),
+                TranslatableContainer::make(
+                    Forms\Components\TextInput::make('specialty')
+                        ->maxLength(255)
+                        ->required()
+                )
+                    ->onlyMainLocaleRequired()
+                    ->requiredLocales(['fr', 'ar']),
                 Forms\Components\TextInput::make('national_order_number')
                     ->required()
                     ->maxLength(255),

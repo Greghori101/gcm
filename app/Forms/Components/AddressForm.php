@@ -51,15 +51,6 @@ class AddressForm extends Forms\Components\Field
             Forms\Components\TextInput::make('city')
                 ->required()
                 ->maxLength(255),
-            Forms\Components\TextInput::make('formatted_address')
-                ->required()
-                ->maxLength(255),
-            Forms\Components\TextInput::make('latitude')
-                ->required()
-                ->numeric(),
-            Forms\Components\TextInput::make('longitude')
-                ->required()
-                ->numeric(),
         ];
     }
 

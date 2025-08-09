@@ -29,12 +29,20 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('firstname')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('lastname')
-                    ->required()
-                    ->maxLength(255),
+                TranslatableContainer::make(
+                    Forms\Components\TextInput::make('firstname')
+                        ->maxLength(255)
+                        ->required()
+                )
+                    ->onlyMainLocaleRequired()
+                    ->requiredLocales(['fr', 'ar']),
+                TranslatableContainer::make(
+                    Forms\Components\TextInput::make('lastname')
+                        ->maxLength(255)
+                        ->required()
+                )
+                    ->onlyMainLocaleRequired()
+                    ->requiredLocales(['fr', 'ar']),
                 Forms\Components\DatePicker::make('birthdate')
                     ->required(),
                 Forms\Components\TagsInput::make('phone_number')

@@ -18,6 +18,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\SpatieLaravelTranslatablePlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -48,6 +49,8 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('GCM')
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('3rem')
+            ->plugin(SpatieLaravelTranslatablePlugin::make()
+                ->defaultLocales(['fr', 'ar']))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

@@ -53,14 +53,20 @@ class PatientForm extends Forms\Components\Field
     {
         return [
             Forms\Components\Grid::make()->columns(2)->schema([
-                Forms\Components\TextInput::make('firstname')
-                    ->required()
-                    ->maxLength(255)
-                    ->columnSpan(1),
-                Forms\Components\TextInput::make('lastname')
-                    ->required()
-                    ->maxLength(255)
-                    ->columnSpan(1),
+                TranslatableContainer::make(
+                    Forms\Components\TextInput::make('firstname')
+                        ->maxLength(255)
+                        ->required()
+                )
+                    ->onlyMainLocaleRequired()
+                    ->requiredLocales(['fr', 'ar']),
+                TranslatableContainer::make(
+                    Forms\Components\TextInput::make('lastname')
+                        ->maxLength(255)
+                        ->required()
+                )
+                    ->onlyMainLocaleRequired()
+                    ->requiredLocales(['fr', 'ar']),
                 Forms\Components\DatePicker::make('birthdate')
                     ->required()
                     ->columnSpan(1),
