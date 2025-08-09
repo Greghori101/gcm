@@ -103,4 +103,17 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasName, H
     {
         return $this->morphOne(Media::class, 'model')->where('collection_name', 'avatar');
     }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
+    }
+    public function currentPlan()
+    {
+        return $this->subscription?->plan;
+    }
+    public function hasFeature($featureName)
+    {
+        return $this->currentPlan()?->features()->where('name', $featureName)->exists();
+    }
 }
