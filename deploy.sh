@@ -4,6 +4,10 @@
 
 echo "🚀 Starting GCM deployment..."
 
+# Wait for database to be ready
+echo "⏳ Waiting for database to be ready..."
+sleep 10
+
 # Copy production environment file
 if [ ! -f .env ]; then
     echo "📝 Creating .env file from production template..."
@@ -12,14 +16,16 @@ if [ ! -f .env ]; then
 fi
 
 # Generate application key if not set
-if ! grep -q "APP_KEY=base64:" .env; then
-    echo "🔑 Generating application key..."
-    docker-compose exec app php artisan key:generate --force
-fi
+echo "🔑 Generating application key..."
+docker-compose exec app php artisan key:generate --force
 
 # Run migrations
 echo "🗄️  Running database migrations..."
 docker-compose exec app php artisan migrate --force
+
+# Seed database if needed
+echo "🌱 Seeding database..."
+docker-compose exec app php artisan db:seed --force
 
 # Optimize Laravel
 echo "⚡ Optimizing Laravel application..."

@@ -14,34 +14,47 @@ services:
     ports:
       - "80:80"
     environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - DB_HOST=db
-      - DB_DATABASE=gcm
-      - DB_USERNAME=gcm_user
-      - DB_PASSWORD=secure_password
-      - REDIS_HOST=redis
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${APP_URL:-http://localhost}
+      - DB_HOST=${DB_HOST:-mysql}
+      - DB_DATABASE=${DB_DATABASE:-gcm}
+      - DB_USERNAME=${DB_USERNAME:-gcm_user}
+      - DB_PASSWORD=${DB_PASSWORD:-secure_password}
+      - REDIS_HOST=${REDIS_HOST:-redis}
     depends_on:
-      - db
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - gcm_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  db:
+  mysql:
     image: mysql:8.0
-    container_name: gcm_db
+    container_name: gcm_mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: gcm
-      MYSQL_USER: gcm_user
-      MYSQL_PASSWORD: secure_password
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: ${DB_DATABASE:-gcm}
+      MYSQL_USER: ${DB_USERNAME:-gcm_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secure_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
     volumes:
-      - db_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     ports:
       - "3306:3306"
     networks:
       - gcm_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -51,9 +64,14 @@ services:
       - "6379:6379"
     networks:
       - gcm_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
-  db_data:
+  mysql_data:
     driver: local
 
 networks:
