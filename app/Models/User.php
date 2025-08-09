@@ -74,6 +74,12 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasName, H
         return $this->hasOne(Patient::class);
     }
 
+
+    public function doctor()
+    {
+        return $this->hasOne(Doctor::class);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return true;

@@ -33,6 +33,7 @@ class UserResource extends Resource
             ->schema([
                 SpatieMediaLibraryFileUpload::make('avatar')
                     ->avatar()
+                    ->imageEditor()
                     ->collection('avatar'),
                 TranslatableContainer::make(
                     Forms\Components\TextInput::make('firstname')
