@@ -9,6 +9,7 @@ use App\Models\User;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
+use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
 
 class PatientForm extends Forms\Components\Field
 {

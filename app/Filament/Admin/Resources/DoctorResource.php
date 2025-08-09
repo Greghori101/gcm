@@ -3,15 +3,14 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\DoctorResource\Pages;
-use App\Filament\Admin\Resources\DoctorResource\RelationManagers;
 use App\Models\Doctor;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class DoctorResource extends Resource
 {
@@ -32,6 +31,10 @@ class DoctorResource extends Resource
                 )
                     ->onlyMainLocaleRequired()
                     ->requiredLocales(['fr', 'ar']),
+
+                SpatieMediaLibraryFileUpload::make('logo')
+                    ->avatar()
+                    ->collection('logo'),
                 Forms\Components\TextInput::make('national_order_number')
                     ->required()
                     ->maxLength(255),
