@@ -2,75 +2,144 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Models\Plan;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Form;
 use Filament\Pages\Auth\Register as BaseRegister;
-use JaOcero\RadioDeck\Forms\Components\RadioDeck;
-use Filament\Support\Enums\IconSize;
-use Filament\Support\Enums\Alignment;
-use Filament\Support\Enums\IconPosition;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\Radio;
+use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
 
 class Register extends BaseRegister
 {
+
+    protected function handleRegistration(array $data): Model
+    {
+        // Create the user
+        $user = $this->getUserModel()::create([
+            'firstname' => $data['firstname'],
+            'lastname' => $data['lastname'],
+            'birthdate' => $data['birthdate'],
+            'phone_number' => $data['phone_number'],
+            'blood_type' => $data['blood_type'],
+            'gender' => $data['gender'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+        ]);
+
+        // Assign role
+        $user->assignRole($data['role']);
+
+        // Create doctor profile
+        $doctor = $user->doctor()->create([
+            'specialty' => $data['specialty'],
+            'national_order_number' => $data['national_order_number'],
+        ]);
+
+        // Create address for doctor
+        $doctor->address()->create([
+            'country' => $data['country'],
+            'state' => $data['state'],
+            'commune' => $data['commune'],
+            'city' => $data['city'],
+        ]);
+
+        // Create subscription
+        $user->subscription()->create([
+            'plan_id' => $data['plan_id'],
+            'start_date' => now(),
+            'end_date' => now()->addYear(),
+            'status' => \App\Enums\SubscriptionStatus::Active,
+        ]);
+
+        return $user;
+    }
+
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                RadioDeck::make('name')
-                    ->options([
-                        'ios' => 'iOS',
-                        'android' => 'Android',
-                        'web' => 'Web',
-                        'windows' => 'Windows',
-                        'mac' => 'Mac',
-                        'linux' => 'Linux',
-                    ])
-                    ->descriptions([
-                        'ios' => 'iOS Mobile App',
-                        'android' => 'Android Mobile App',
-                        'web' => 'Web App',
-                        'windows' => 'Windows Desktop App',
-                        'mac' => 'Mac Desktop App',
-                        'linux' => 'Linux Desktop App',
-                    ])
-                    ->icons([
-                        'ios' => 'heroicon-m-device-phone-mobile',
-                        'android' => 'heroicon-m-device-phone-mobile',
-                        'web' => 'heroicon-m-globe-alt',
-                        'windows' => 'heroicon-m-computer-desktop',
-                        'mac' => 'heroicon-m-computer-desktop',
-                        'linux' => 'heroicon-m-computer-desktop',
-                    ])
-                    ->required()
-                    ->iconSize(IconSize::Large) // Small | Medium | Large | (string - sm | md | lg)
-                    ->iconSizes([ // Customize the values for each icon size
-                        'sm' => 'h-12 w-12',
-                        'md' => 'h-14 w-14',
-                        'lg' => 'h-16 w-16',
-                    ])
-                    ->iconPosition(IconPosition::Before) // Before | After | (string - before | after)
-                    ->alignment(Alignment::Center) // Start | Center | End | (string - start | center | end)
-                    ->gap('gap-5') // Gap between Icon and Description (Any TailwindCSS gap-* utility)
-                    ->padding('px-4 px-6') // Padding around the deck (Any TailwindCSS padding utility)
-                    ->direction('column') // Column | Row (Allows to place the Icon on top)
-                    ->extraCardsAttributes([ // Extra Attributes to add to the card HTML element
-                        'class' => 'rounded-xl'
-                    ])
-                    ->extraOptionsAttributes([ // Extra Attributes to add to the option HTML element
-                        'class' => 'text-3xl leading-none w-full flex flex-col items-center justify-center p-4'
-                    ])
-                    ->extraDescriptionsAttributes([ // Extra Attributes to add to the description HTML element
-                        'class' => 'text-sm font-light text-center'
-                    ])
-                    ->color('primary') // supports all color custom or not
-                    ->multiple(),
-                TextInput::make('username')
-                    ->required()
-                    ->maxLength(255),
-                $this->getNameFormComponent(),
-                $this->getEmailFormComponent(),
-                $this->getPasswordFormComponent(),
-                $this->getPasswordConfirmationFormComponent(),
-            ]);
+        return $form->schema([
+            Forms\Components\Hidden::make('role')->default(\App\Enums\Roles::DOCTOR->value),
+            Forms\Components\Wizard::make([
+                Forms\Components\Wizard\Step::make('Account')
+                    ->schema([
+                        Grid::make(2)->schema([
+                            Radio::make('plan_id')
+                                ->label('Choose a Plan')
+                                ->options(fn() => Plan::all()->pluck('name', 'id'))
+                                ->descriptions(fn() => Plan::all()->pluck('price', 'id'))
+                                ->inline()
+                                ->inlineLabel(false)
+                                ->columnSpanFull()
+                                ->required(),
+                            TranslatableContainer::make(
+                                Forms\Components\TextInput::make('firstname')
+                                    ->maxLength(255)
+                                    ->required()
+                            )
+                                ->onlyMainLocaleRequired()
+                                ->requiredLocales(['fr', 'ar'])
+                                ->columnSpan(1),
+                            TranslatableContainer::make(
+                                Forms\Components\TextInput::make('lastname')
+                                    ->maxLength(255)
+                                    ->required()
+                            )
+                                ->onlyMainLocaleRequired()
+                                ->requiredLocales(['fr', 'ar'])
+                                ->columnSpan(1),
+
+
+
+                            TextInput::make('birthdate')->label('Birthdate')->type('date')->required()
+                                ->columnSpan(1),
+                            TextInput::make('phone_number')->label('Phone Number')->required()->maxLength(255)
+                                ->columnSpan(1),
+                            Forms\Components\Select::make('blood_type')
+                                ->label('Blood Type')
+                                ->options(\App\Enums\BloodTypes::toArray())
+                                ->required()
+                                ->columnSpan(1),
+                            Forms\Components\Select::make('gender')
+                                ->label('Gender')
+                                ->options(\App\Enums\Genders::toArray())
+                                ->required()
+                                ->columnSpan(1),
+                            TextInput::make('email')->label('Email')->email()->required()->maxLength(255)
+                                ->columnSpanFull(),
+                            TextInput::make('password')->label('Password')->password()->required()->maxLength(255)
+                                ->columnSpan(1),
+                            TextInput::make('password_confirmation')->label('Confirm Password')->password()->required()->maxLength(255)
+                                ->columnSpan(1),
+                        ]),
+
+                    ]),
+                Forms\Components\Wizard\Step::make('Doctor')
+                    ->schema([
+                        Grid::make(2)->schema([
+                            TranslatableContainer::make(
+                                Forms\Components\TextInput::make('specialty')
+                                    ->maxLength(255)
+                                    ->required()
+                            )
+                                ->onlyMainLocaleRequired()
+                                ->requiredLocales(['fr', 'ar'])
+                                ->columnSpan(1),
+                            TextInput::make('national_order_number')->label('National Order Number')->required()->maxLength(255)
+                                ->columnSpan(1),
+                            TextInput::make('country')->label('Country')->required()->maxLength(255)
+                                ->columnSpan(1),
+                            TextInput::make('state')->label('State')->required()->maxLength(255)
+                                ->columnSpan(1),
+                            TextInput::make('commune')->label('Commune')->required()->maxLength(255)
+                                ->columnSpan(1),
+                            TextInput::make('city')->label('City')->required()->maxLength(255)
+                                ->columnSpan(1),
+                        ]),
+
+                    ]),
+            ])
+        ]);
     }
 }
