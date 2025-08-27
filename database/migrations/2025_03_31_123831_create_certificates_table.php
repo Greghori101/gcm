@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('certificates', function (Blueprint $table) {
-            $table->uuid('id')->primary()->unique();
+            $table->uuid('id')->unique();
             $table->bigIncrements('nb')->unique();
             $table->string('period');
             $table->string('signature');

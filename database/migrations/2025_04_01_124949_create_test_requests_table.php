@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('test_requests', function (Blueprint $table) {
-            $table->uuid('id')->primary()->unique();
+            $table->uuid('id')->unique();
             $table->bigIncrements('nb')->unique();
             $table->json('past_medical_history');
             $table->string('visit_purpose');
