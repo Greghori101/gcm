@@ -51,7 +51,7 @@ class Register extends BaseRegister
             'plan_id' => $data['plan_id'],
             'start_date' => now(),
             'end_date' => now()->addYear(),
-            'status' => \App\Enums\SubscriptionStatus::Active,
+            'status' => \App\Enums\SubscriptionStatus::Pending,
         ]);
 
         return $user;
@@ -94,8 +94,9 @@ class Register extends BaseRegister
 
                             TextInput::make('birthdate')->label('Birthdate')->type('date')->required()
                                 ->columnSpan(1),
-                            TextInput::make('phone_number')->label('Phone Number')->required()->maxLength(255)
-                                ->columnSpan(1),
+                            Forms\Components\TagsInput::make('phone_number')
+                                ->required()
+                                ->separator(','),
                             Forms\Components\Select::make('blood_type')
                                 ->label('Blood Type')
                                 ->options(\App\Enums\BloodTypes::toArray())

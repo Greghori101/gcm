@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignUuid('plan_id')->nullable()->index();
             $table->date('start_date');
             $table->date('end_date');
-            $table->enum('status', ['active', 'canceled', 'expired'])->default('active');
+            $table->enum('status', ['pending', 'active', 'canceled', 'expired'])->default('active');
             $table->timestamps();
             $table->softDeletes();
         });

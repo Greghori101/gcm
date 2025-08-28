@@ -23,7 +23,11 @@ class DatabaseSeeder extends Seeder
         $runPlansSeeder = true;
         $runQueueSeeder = true;
         $runMedicinesSeeder = true;
+        $runRolesPermissionsSeeder = true;
 
+        if ($runRolesPermissionsSeeder) {
+            $this->call(RoleWithPermissionsSeeder::class);
+        }
         if ($runPlansSeeder) {
             $this->call(DefaultPlansSeeder::class);
         }
@@ -33,7 +37,6 @@ class DatabaseSeeder extends Seeder
         if ($runMedicinesSeeder) {
             $this->call(MedicinesSeeder::class);
         }
-
         if (!$runDatabaseSeeder) {
             return;
         }
