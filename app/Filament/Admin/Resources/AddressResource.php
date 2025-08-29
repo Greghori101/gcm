@@ -21,7 +21,7 @@ class AddressResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-map-pin';
 
-    protected static ?string $recordTitleAttribute = 'formatted_address';
+    protected static ?string $recordTitleAttribute = 'country';
 
     public static function form(Form $form): Form
     {
@@ -39,15 +39,6 @@ class AddressResource extends Resource
                 Forms\Components\TextInput::make('city')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('formatted_address')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('latitude')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('longitude')
-                    ->required()
-                    ->numeric(),
                 Forms\Components\TextInput::make('addressable_type')
                     ->required()
                     ->maxLength(255),
@@ -71,8 +62,6 @@ class AddressResource extends Resource
                 Tables\Columns\TextColumn::make('commune')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('city')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('formatted_address')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('latitude')
                     ->numeric()

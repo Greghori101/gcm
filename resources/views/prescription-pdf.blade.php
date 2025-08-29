@@ -108,7 +108,6 @@
                 {{ $record->doctor?->user?->lastname . ' ' . $record->doctor?->user?->firstname }}
             </div>
             <div>{{ __('interface.specialty') }}: {{ $record->doctor?->specialty }}</div>
-            <div> {{ $record->doctor?->address?->formatted_address }}</div>
             <div>{{ __('interface.order_number') }}: {{ $record->doctor?->national_order_number ?? '-' }}</div>
         </div>
 

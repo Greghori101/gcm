@@ -11,6 +11,8 @@ use Filament\Pages\Auth\Register as BaseRegister;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\Radio;
 use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\HtmlString;
 
 class Register extends BaseRegister
 {
@@ -140,7 +142,19 @@ class Register extends BaseRegister
                         ]),
 
                     ]),
-            ])
+            ])->submitAction(new HtmlString(Blade::render(<<<BLADE
+                    <x-filament::button
+                        type="submit"
+                        size="sm"
+                    >
+                        Register
+                    </x-filament::button>
+                BLADE))),
         ]);
+    }
+
+    protected function getFormActions(): array
+    {
+        return [];
     }
 }

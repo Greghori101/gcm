@@ -66,9 +66,6 @@ class AddressForm extends Forms\Components\Field
                 'city' => null,
                 'state' => null,
                 'commune' => null,
-                'latitude' => null,
-                'longitude' => null,
-                'formatted_address' => null,
             ]);
         });
 
