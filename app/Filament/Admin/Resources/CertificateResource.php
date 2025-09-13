@@ -18,6 +18,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
 
 class CertificateResource extends Resource
 {
@@ -47,36 +48,38 @@ class CertificateResource extends Resource
                     ->preload()
                     ->required()
                     ->createOptionForm([
-                        Forms\Components\TextInput::make('firstname')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('lastname')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\DatePicker::make('birthdate')
-                            ->required(),
-                        Forms\Components\TagsInput::make('phone_number')
-                            ->required()
-                            ->separator(','),
-                        Forms\Components\Select::make('blood_type')
-                            ->options(BloodTypes::toArray())
-                            ->required(),
-                        Forms\Components\Select::make('gender')
-                            ->options(Genders::toArray())
-                            ->required(),
-                        Forms\Components\TextInput::make('email')
-                            ->email()
-                            ->required()
-                            ->maxLength(255),
-                    ])
-                    ->createOptionUsing(function (array $data): string {
-                        $data['password'] =  Hash::make('password');
-                        $user = User::create($data);
-                        $patient = Patient::create([]);
-                        $user->patient()->save($patient);
-                        return $patient->getKey();
-                    }),
-
+                        Forms\Components\Grid::make()->columns(2)->schema([
+                            TranslatableContainer::make(
+                                Forms\Components\TextInput::make('firstname')
+                                    ->maxLength(255)
+                                    ->required()
+                            )
+                                ->onlyMainLocaleRequired()
+                                ->requiredLocales(['fr', 'ar']),
+                            TranslatableContainer::make(
+                                Forms\Components\TextInput::make('lastname')
+                                    ->maxLength(255)
+                                    ->required()
+                            )
+                                ->onlyMainLocaleRequired()
+                                ->requiredLocales(['fr', 'ar']),
+                            Forms\Components\DatePicker::make('birthdate')
+                                ->required()
+                                ->columnSpan(1),
+                            Forms\Components\TagsInput::make('phone_number')
+                                ->required()
+                                ->separator(',')
+                                ->columnSpan(1),
+                            Forms\Components\Select::make('blood_type')
+                                ->options(BloodTypes::toArray())
+                                ->required()
+                                ->columnSpan(1),
+                            Forms\Components\Select::make('gender')
+                                ->options(Genders::toArray())
+                                ->required()
+                                ->columnSpan(1),
+                        ])
+                    ]),
             ]);
     }
 

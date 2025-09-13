@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Patient extends Model
 {
     //
-    use HasUuids;
+    use HasUuids, HasTranslations;
+
+    public array $translatable = ['firstname', 'lastname'];
 
     /**
      * The attributes that are mass assignable.
@@ -16,6 +19,12 @@ class Patient extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'firstname',
+        'lastname',
+        'birthdate',
+        'phone_number',
+        'blood_type',
+        'gender',
         'medical_history'
     ];
 

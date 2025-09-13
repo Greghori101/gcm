@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources;
 
+use App\Enums\BloodTypes;
+use App\Enums\Genders;
 use Carbon\Carbon;
 use App\Filament\Admin\Resources\PrescriptionResource\Pages;
 use App\Filament\Admin\Resources\PrescriptionResource\RelationManagers;
@@ -12,11 +14,13 @@ use App\Models\Form as FormModel;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Infolists\Infolist;
+use Filament\Infolists;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Infolists;
+use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
 
 class PrescriptionResource extends Resource
 {
@@ -31,115 +35,154 @@ class PrescriptionResource extends Resource
         return $form
             ->schema([
 
-                Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('patient')
-                        ->schema([
-                            PatientForm::make('patient')
-                                ->columnSpan('full'),
-                            Forms\Components\DatePicker::make('date')
-                                ->default(Carbon::today())
+                Forms\Components\Select::make('patient_id')
+                    ->relationship('patient', 'id')
+                    ->preload()
+                    ->required()
+                    ->createOptionForm([
+                        Forms\Components\Grid::make()->columns(2)->schema([
+                            TranslatableContainer::make(
+                                Forms\Components\TextInput::make('firstname')
+                                    ->maxLength(255)
+                                    ->required()
+                            )
+                                ->onlyMainLocaleRequired()
+                                ->requiredLocales(['fr', 'ar']),
+                            TranslatableContainer::make(
+                                Forms\Components\TextInput::make('lastname')
+                                    ->maxLength(255)
+                                    ->required()
+                            )
+                                ->onlyMainLocaleRequired()
+                                ->requiredLocales(['fr', 'ar']),
+                            Forms\Components\DatePicker::make('birthdate')
                                 ->required()
-                                ->columnSpanFull(),
-                            Forms\Components\Textarea::make('purpose')
+                                ->columnSpan(1),
+                            Forms\Components\TagsInput::make('phone_number')
                                 ->required()
-                                ->columnSpanFull(),
+                                ->separator(',')
+                                ->columnSpan(1),
+                            Forms\Components\Select::make('blood_type')
+                                ->options(BloodTypes::toArray())
+                                ->required()
+                                ->columnSpan(1),
+                            Forms\Components\Select::make('gender')
+                                ->options(Genders::toArray())
+                                ->required()
+                                ->columnSpan(1),
+                        ])
+                    ])
+                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->firstname} {$record->lastname}")
+                    ->columnSpanFull(),
+                Forms\Components\DatePicker::make('date')
+                    ->default(Carbon::today())
+                    ->required()
+                    ->columnSpanFull(),
+                Forms\Components\Textarea::make('purpose')
+                    ->required()
+                    ->columnSpanFull(),
 
-                        ]),
-                    Forms\Components\Wizard\Step::make('medicines')
-                        ->schema([
-                            Forms\Components\Repeater::make('prescriptionMedicines')
-                                ->relationship()
-                                ->schema([
-                                    Forms\Components\Select::make('medicine_id')
-                                        ->relationship('medicine', 'name')
-                                        ->required()
-                                        ->searchable(['name', 'brand', 'dosage'])
 
-                                        ->getSearchResultsUsing(function (string $search) {
-                                            return \App\Models\Medicine::query()
-                                                ->select('id', 'name', 'brand', 'dosage')
-                                                ->whereRaw("CONCAT(brand, ' ', name, ' ', dosage) LIKE ?", ["%{$search}%"])
-                                                ->limit(10)
-                                                ->get()
-                                                ->mapWithKeys(fn($item) => [
-                                                    $item->id => "{$item->brand} / {$item->name} / {$item->form} / {$item->dosage}"
-                                                ])
-                                                ->toArray();
-                                        })
-                                        ->afterStateUpdated(function ($set, Get $get) {
-                                            $dosage = $get('medicine_id') ? Medicine::find($get('medicine_id'))?->dosage : '';
-                                            $set('dosage', $dosage);
-                                        })
-                                        ->preload()
-                                        ->optionsLimit(10)
-                                        ->columnSpan(3)
-                                        ->getOptionLabelFromRecordUsing(fn($record) => "{$record->brand} / {$record->name} / {$record->form} / {$record->dosage}")
-                                        ->reactive(),
-                                    Forms\Components\Toggle::make('is_qsp')
-                                        ->columnSpan(1)
-                                        ->inline(false)
-                                        ->required()
-                                        ->reactive(),
-                                    Forms\Components\TextInput::make('quantity')
-                                        ->columnSpan(1)
-                                        ->numeric()
-                                        ->required(),
-                                    Forms\Components\Hidden::make('dosage'),
-                                    Forms\Components\TextInput::make('unit')
-                                        ->columnSpan(1)
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->hidden(fn(Get $get) => $get('is_qsp')),
-                                    Forms\Components\Select::make('unit')
-                                        ->options(['days' => 'days', 'months' => 'months', 'weeks' => 'weeks',])
-                                        ->columnSpan(1)
-                                        ->required()
-                                        ->hidden(fn(Get $get) => !$get('is_qsp')),
-                                    Forms\Components\TextInput::make('qte')
-                                        ->numeric()
-                                        ->columnSpan(1)
-                                        ->required()
-                                        ->maxLength(255),
-                                    Forms\Components\Select::make('form')
-                                        ->options(function (Get $get) {
-                                            $medicine = Medicine::find($get('medicine_id'));
-                                            if (!$medicine) {
-                                                return [];
-                                            }
-                                            $notations = FormModel::where('form', $medicine->form)->first()?->notations ?? [];
-                                            // Ensure $notations is always an array
-                                            if (is_string($notations)) {
-                                                $notations = explode(',', $notations);
-                                            }
-                                            if (!is_array($notations)) {
-                                                $notations = [];
-                                            }
-                                            // Return as associative array for Filament Select
-                                            return collect($notations)
-                                                ->mapWithKeys(fn($item) => [$item => $item])
-                                                ->toArray();
-                                        })
-                                        ->columnSpan(1)
-                                        ->required(),
-                                    Forms\Components\TextInput::make('frequency')
-                                        ->columnSpan(1)
-                                        ->required()
-                                        ->maxLength(255),
-                                    Forms\Components\Select::make('periodicity')
-                                        ->options(['day' => 'day', 'month' => 'month', 'week' => 'week',])
-                                        ->columnSpan(1)
-                                        ->required(),
-                                    Forms\Components\TagsInput::make('conditions')
-                                        ->columnSpan(2)
-                                        ->separator(','),
-                                ])
-                                ->columns(3)
-                                ->columnSpanFull()
-                                ->reorderable(true),
+                Forms\Components\Repeater::make('prescriptionMedicines')
+                    ->relationship()
+                    ->cloneable()
+                    ->schema(
+                        [
+                            Forms\Components\Select::make('medicine_id')
+                                ->relationship('medicine', 'name')
+                                ->required()
+                                ->searchable(['name', 'brand', 'dosage'])
+                                ->getSearchResultsUsing(function (string $search) {
+                                    return \App\Models\Medicine::query()
+                                        ->select('id', 'name', 'brand', 'dosage')
+                                        ->whereRaw("CONCAT(brand, ' ', name, ' ', dosage) LIKE ?", ["%{$search}%"])
+                                        ->limit(10)
+                                        ->get()
+                                        ->mapWithKeys(fn($item) => [
+                                            $item->id => "{$item->brand} / {$item->name} / {$item->form} / {$item->dosage}"
+                                        ])
+                                        ->toArray();
+                                })
+                                ->afterStateUpdated(function ($set, Get $get) {
+                                    $dosage = $get('medicine_id') ? Medicine::find($get('medicine_id'))?->dosage : '';
+                                    $set('dosage', $dosage);
+                                })
+                                ->preload()
+                                ->optionsLimit(10)
+                                ->columnSpan(3)
+                                ->getOptionLabelFromRecordUsing(fn($record) => "{$record->brand} / {$record->name} / {$record->form} / {$record->dosage}")
+                                ->reactive(),
+                            Forms\Components\Toggle::make('is_qsp')
+                                ->columnSpan(1)
+                                ->inline(false)
+                                ->required()
+                                ->reactive(),
+                            Forms\Components\TextInput::make('quantity')
+                                ->columnSpan(1)
+                                ->numeric()
+                                ->required(),
+                            Forms\Components\Hidden::make('dosage'),
+                            Forms\Components\Hidden::make('unit'),
+                            Forms\Components\TextInput::make('unit_text')
+                                ->columnSpan(1)
+                                ->required()
+                                ->maxLength(255)
+                                ->hidden(fn(Get $get) => $get('is_qsp'))
+                                ->afterStateUpdated(function ($set, $state) {
+                                    $set('unit', $state);
+                                }),
+                            Forms\Components\Select::make('unit_select')
+                                ->options(['days' => 'days', 'months' => 'months', 'weeks' => 'weeks',])
+                                ->columnSpan(1)
+                                ->required()
+                                ->hidden(fn(Get $get) => !$get('is_qsp'))
+                                ->afterStateUpdated(function ($set, $state) {
+                                    $set('unit', $state);
+                                }),
+                            Forms\Components\TextInput::make('qte')
+                                ->numeric()
+                                ->columnSpan(1)
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('form')
+                                ->datalist(function (Get $get) {
+                                    $medicine = Medicine::find($get('medicine_id'));
+                                    if (!$medicine) {
+                                        return [];
+                                    }
 
-                        ]),
-                ])
+                                    $notations = FormModel::where('form', $medicine->form)->first()?->notations ?? [];
+
+                                    if (is_string($notations)) {
+                                        $notations = explode(',', $notations);
+                                    }
+                                    if (!is_array($notations)) {
+                                        $notations = [];
+                                    }
+
+                                    return collect($notations)
+                                        ->mapWithKeys(fn($item) => [$item => $item])
+                                        ->toArray();
+                                })
+                                ->columnSpan(1)
+                                ->required(),
+
+                            Forms\Components\TextInput::make('frequency')
+                                ->columnSpan(1)
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\Select::make('periodicity')
+                                ->options(['day' => 'day', 'month' => 'month', 'week' => 'week',])
+                                ->columnSpan(1)
+                                ->required(),
+                            Forms\Components\TagsInput::make('conditions')
+                                ->columnSpan(2)
+                                ->separator(','),
+                        ]
+                    )
+                    ->columns(3)
                     ->columnSpanFull()
+                    ->reorderable(true),
             ]);
     }
 
@@ -192,28 +235,28 @@ class PrescriptionResource extends Resource
             ->schema([
                 Infolists\Components\Section::make()->columns(3) // Two columns
                     ->schema([
-                        Infolists\Components\TextEntry::make('patient.user.firstname')
+                        Infolists\Components\TextEntry::make('patient.firstname')
                             ->label('First Name')
                             ->inlineLabel(true)
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('patient.user.lastname')
+                        Infolists\Components\TextEntry::make('patient.lastname')
                             ->label('Last Name')
                             ->inlineLabel(true)
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('patient.user.birthdate')
+                        Infolists\Components\TextEntry::make('patient.birthdate')
                             ->label('Birthdate')
                             ->inlineLabel(true)
                             ->date()
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('patient.user.phone_number')
+                        Infolists\Components\TextEntry::make('patient.phone_number')
                             ->label('Phone Number')
                             ->inlineLabel(true)
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('patient.user.blood_type')
+                        Infolists\Components\TextEntry::make('patient.blood_type')
                             ->inlineLabel(true)
                             ->label('Blood Type')
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('patient.user.gender')
+                        Infolists\Components\TextEntry::make('patient.gender')
                             ->inlineLabel(true)
                             ->label('Gender')
                             ->columnSpan(1),

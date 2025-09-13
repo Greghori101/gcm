@@ -12,11 +12,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
-use Filament\Forms\Components\Actions\Action as FormsAction;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Infolists\Infolist;
+use Filament\Infolists;
 
 class PatientResource extends Resource
 {
@@ -60,69 +58,6 @@ class PatientResource extends Resource
                         ->options(Genders::toArray())
                         ->required()
                         ->columnSpan(1),
-                    Forms\Components\Select::make('user_id')
-                        ->label('User')
-                        ->relationship('user', 'email')
-                        ->searchable()
-                        ->options(function () {
-                            return \App\Models\User::whereDoesntHave('doctor')->pluck('email', 'id');
-                        })
-                        ->createOptionForm([
-                            Forms\Components\Grid::make(2)
-                                ->schema([
-                                    SpatieMediaLibraryFileUpload::make('avatar')
-                                        ->avatar()
-                                        ->imageEditor()
-                                        ->collection('avatar')
-                                        ->columnSpanFull(),
-                                    TranslatableContainer::make(
-                                        Forms\Components\TextInput::make('firstname')
-                                            ->maxLength(255)
-                                            ->required()
-                                    )
-                                        ->onlyMainLocaleRequired()
-                                        ->requiredLocales(['fr', 'ar'])
-                                        ->columnSpan(1),
-                                    TranslatableContainer::make(
-                                        Forms\Components\TextInput::make('lastname')
-                                            ->maxLength(255)
-                                            ->required()
-                                    )
-                                        ->onlyMainLocaleRequired()
-                                        ->requiredLocales(['fr', 'ar'])
-                                        ->columnSpan(1),
-                                    Forms\Components\DatePicker::make('birthdate')
-                                        ->required()
-                                        ->columnSpan(1),
-                                    Forms\Components\TagsInput::make('phone_number')
-                                        ->required()
-                                        ->separator(',')
-                                        ->columnSpan(1),
-                                    Forms\Components\Select::make('blood_type')
-                                        ->options(BloodTypes::toArray())
-                                        ->required()
-                                        ->columnSpan(1),
-                                    Forms\Components\Select::make('gender')
-                                        ->options(Genders::toArray())
-                                        ->required()
-                                        ->columnSpan(1),
-                                    Forms\Components\TextInput::make('email')
-                                        ->email()
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->columnSpan(1),
-                                    Forms\Components\DateTimePicker::make('email_verified_at')
-                                        ->columnSpan(1),
-                                    Forms\Components\TextInput::make('password')
-                                        ->password()
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->columnSpan(1),
-                                ])
-                        ])
-                        ->createOptionAction(fn(FormsAction $action) => $action->modalWidth('3xl'))
-                        ->required()
-
                 ])
             ]);
     }
@@ -133,8 +68,6 @@ class PatientResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('user_id')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -159,10 +92,49 @@ class PatientResource extends Resource
             ]);
     }
 
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make()->columns(3) // Two columns
+                    ->schema([
+                        Infolists\Components\TextEntry::make('patient.firstname')
+                            ->label('First Name')
+                            ->inlineLabel(true)
+                            ->columnSpan(1),
+                        Infolists\Components\TextEntry::make('patient.lastname')
+                            ->label('Last Name')
+                            ->inlineLabel(true)
+                            ->columnSpan(1),
+                        Infolists\Components\TextEntry::make('patient.birthdate')
+                            ->label('Birthdate')
+                            ->inlineLabel(true)
+                            ->date()
+                            ->columnSpan(1),
+                        Infolists\Components\TextEntry::make('patient.phone_number')
+                            ->label('Phone Number')
+                            ->inlineLabel(true)
+                            ->columnSpan(1),
+                        Infolists\Components\TextEntry::make('patient.blood_type')
+                            ->inlineLabel(true)
+                            ->label('Blood Type')
+                            ->columnSpan(1),
+                        Infolists\Components\TextEntry::make('patient.gender')
+                            ->inlineLabel(true)
+                            ->label('Gender')
+                            ->columnSpan(1),
+                    ]),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
             //
+            RelationManagers\PrescriptionsRelationManager::class,
+            RelationManagers\CertificatesRelationManager::class,
+            RelationManagers\TestRequestsRelationManager::class,
         ];
     }
 

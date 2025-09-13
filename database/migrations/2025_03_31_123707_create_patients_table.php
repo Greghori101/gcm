@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
-            $table->json('conditions')->nullable();
+            $table->text('firstname');
+            $table->text('lastname');
+            $table->date('birthdate');
+            $table->text('phone_number')->unique();
+            $table->string('blood_type');
+            $table->string('gender');
+            $table->json('medical_history')->nullable();
             $table->foreignUuid('user_id')->nullable()->index();
             $table->timestamps();
         });
