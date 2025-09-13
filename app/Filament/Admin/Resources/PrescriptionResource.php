@@ -30,6 +30,13 @@ class PrescriptionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
 
+    public static function getWidgets(): array
+    {
+        return [
+            PrescriptionResource\Widgets\CreatePrescriptionWidget::class,
+        ];
+    }
+
     public static function form(Form $form): Form
     {
         return $form

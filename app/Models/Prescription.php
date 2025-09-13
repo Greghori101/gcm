@@ -15,6 +15,7 @@ class Prescription extends Model
         'date',
         'purpose',
         'diagnostic',
+        'patient_id',
     ];
     public function doctor()
     {
