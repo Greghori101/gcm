@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('phone_number')->unique();
             $table->string('blood_type');
             $table->string('gender');
+            $table->string('status')->default('pending');
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

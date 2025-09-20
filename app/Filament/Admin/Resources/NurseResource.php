@@ -25,9 +25,41 @@ class NurseResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
-                    ->maxLength(36)
-                    ->default(null),
+                Forms\Components\Select::make('user_id')
+                    ->label('User')
+                    ->relationship('user', 'email')
+                    ->searchable()
+                    ->options(function () {
+                        return \App\Models\User::whereDoesntHave('nurse')->pluck('email', 'id');
+                    })
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('firstname')
+                            ->label('First Name')
+                            ->maxLength(255)
+                            ->required(),
+                        Forms\Components\TextInput::make('lastname')
+                            ->label('Last Name')
+                            ->maxLength(255)
+                            ->required(),
+                        Forms\Components\DatePicker::make('birthdate')
+                            ->label('Birthdate')
+                            ->required(),
+                        Forms\Components\TagsInput::make('phone_number')
+                            ->label('Phone Number')
+                            ->required()
+                            ->separator(','),
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email')
+                            ->email()
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('password')
+                            ->label('Password')
+                            ->password()
+                            ->required()
+                            ->maxLength(255),
+                    ])
+                    ->required(),
             ]);
     }
 
@@ -35,16 +67,18 @@ class NurseResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('user_id')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('nurse_info')
+                    ->label('Nurse')
+                    ->formatStateUsing(fn($state, $record) => $record->user ? $record->user->firstname . ' ' . $record->user->lastname : '-')
+                    ->getStateUsing(fn($record) => $record->user ? $record->user->firstname . ' ' . $record->user->lastname : '-')
+                    ->searchable(['user.firstname', 'user.lastname']),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Updated At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

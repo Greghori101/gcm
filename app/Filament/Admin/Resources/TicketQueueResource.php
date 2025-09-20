@@ -38,7 +38,6 @@ class TicketQueueResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable(),
                 Tables\Columns\TextColumn::make('name')->label('Queue Name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('priority')->label('Priority')->sortable(),
                 Tables\Columns\TextColumn::make('waiting_count')

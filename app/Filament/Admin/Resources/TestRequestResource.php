@@ -93,9 +93,6 @@ class TestRequestResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('nb')
                     ->numeric()
                     ->sortable(),
@@ -106,8 +103,11 @@ class TestRequestResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('conclusion')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('patient_id')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('patient_info')
+                    ->label('Patient')
+                    ->formatStateUsing(fn($state, $record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
+                    ->getStateUsing(fn($record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
+                    ->searchable(['patient.firstname', 'patient.lastname']),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

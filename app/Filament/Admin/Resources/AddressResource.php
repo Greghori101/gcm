@@ -38,13 +38,7 @@ class AddressResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('city')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('addressable_type')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('addressable_id')
-                    ->required()
-                    ->numeric(),
+                    ->maxLength(255)
             ]);
     }
 
@@ -52,9 +46,6 @@ class AddressResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('country')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('state')
@@ -63,17 +54,6 @@ class AddressResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('city')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('latitude')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('longitude')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('addressable_type')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('addressable_id')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

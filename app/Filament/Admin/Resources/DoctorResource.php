@@ -113,20 +113,27 @@ class DoctorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('doctor_info')
+                    ->label('Doctor')
+                    ->formatStateUsing(fn($state, $record) => $record->user ? $record->user->firstname . ' ' . $record->user->lastname : '-')
+                    ->getStateUsing(fn($record) => $record->user ? $record->user->firstname . ' ' . $record->user->lastname : '-')
+                    ->searchable(['user.firstname', 'user.lastname']),
                 Tables\Columns\TextColumn::make('specialty')
+                    ->label('Specialty')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('national_order_number')
+                    ->label('National Order #')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('user_id')
+                Tables\Columns\TextColumn::make('user.email')
+                    ->label('Email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Updated At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

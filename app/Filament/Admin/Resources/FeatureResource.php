@@ -43,7 +43,6 @@ class FeatureResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable(),
                 Tables\Columns\TextColumn::make('plan.name')->label('Plan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('name')->label('Feature Name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('value')->label('Value')->sortable()->searchable(),

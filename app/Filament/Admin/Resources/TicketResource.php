@@ -56,8 +56,12 @@ class TicketResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable(),
-                Tables\Columns\TextColumn::make('patient_id')->label('Patient')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('patient_info')
+                    ->label('Patient')
+                    ->formatStateUsing(fn($state, $record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
+                    ->getStateUsing(fn($record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
+                    ->sortable()
+                    ->searchable(['patient.firstname', 'patient.lastname']),
                 Tables\Columns\TextColumn::make('queue.name')->label('Queue')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('number')->label('Ticket Number')->sortable(),
                 Tables\Columns\TextColumn::make('ticket_date')->label('Ticket Date')->date()->sortable(),

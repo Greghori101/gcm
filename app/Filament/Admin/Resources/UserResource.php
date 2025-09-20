@@ -76,9 +76,6 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('firstname')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('lastname')
@@ -97,6 +94,15 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->colors([
+                        'success' => fn($state) => $state === 'active',
+                        'warning' => fn($state) => $state === 'pending',
+                        'danger' => fn($state) => $state === 'blocked',
+                    ])
+                    ->formatStateUsing(fn($state) => \App\Enums\UserStatus::toArray()[$state] ?? $state),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -105,6 +111,22 @@ class UserResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('activate')
+                    ->label('Activate')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn($record) => $record->status !== 'active')
+                    ->action(fn($record) => $record->update(['status' => 'active'])),
+                Tables\Actions\Action::make('block')
+                    ->label('Block')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn($record) => $record->status !== 'blocked')
+                    ->action(fn($record) => $record->update(['status' => 'blocked'])),
             ])
             ->filters([
                 //

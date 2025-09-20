@@ -54,7 +54,6 @@ class SubscriptionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable(),
                 Tables\Columns\TextColumn::make('user.email')->label('User')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('plan.name')->label('Plan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('start_date')->label('Start Date')->date()->sortable(),

@@ -76,9 +76,6 @@ class MedicineResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('ne')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('code')

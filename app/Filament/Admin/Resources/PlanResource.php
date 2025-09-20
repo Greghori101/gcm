@@ -45,7 +45,6 @@ class PlanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable(),
                 Tables\Columns\TextColumn::make('name')->label('Plan Name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('price')->label('Price')->sortable(),
                 Tables\Columns\TextColumn::make('billing_cycle')->label('Billing Cycle')->sortable(),

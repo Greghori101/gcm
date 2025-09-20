@@ -45,11 +45,12 @@ class FormResource extends Resource
     {
         return $table
             ->columns([
-                //
                 Tables\Columns\TextColumn::make('form')
                     ->label('Form')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('notations'),
+                Tables\Columns\TextColumn::make('notations')
+                    ->label('Notations')
+                    ->formatStateUsing(fn($state) => is_array($state) ? implode(', ', $state) : $state),
             ])
             ->filters([
                 //

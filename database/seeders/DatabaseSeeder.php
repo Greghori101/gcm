@@ -53,6 +53,7 @@ class DatabaseSeeder extends Seeder
                 'phone_number' => '[1234567899]',
                 'blood_type' => 'a+',
                 'gender' => 'male',
+                'status' => 'active',
                 'birthdate' => '2001-12-11',
                 'email_verified_at' => Carbon::now(),
             ]
@@ -75,6 +76,7 @@ class DatabaseSeeder extends Seeder
                 'phone_number' => '[1234567890]',
                 'blood_type' => 'a+',
                 'gender' => 'male',
+                'status' => 'active',
                 'birthdate' => '2001-12-11',
                 'email_verified_at' => Carbon::now(),
             ]
