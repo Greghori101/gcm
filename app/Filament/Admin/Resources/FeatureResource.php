@@ -2,11 +2,23 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Admin\Resources\FeatureResource\Pages\ListFeatures;
+use App\Filament\Admin\Resources\FeatureResource\Pages\CreateFeature;
+use App\Filament\Admin\Resources\FeatureResource\Pages\EditFeature;
 use App\Filament\Admin\Resources\FeatureResource\Pages;
 use App\Filament\Admin\Resources\FeatureResource\RelationManagers;
 use App\Models\Feature;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,22 +29,22 @@ class FeatureResource extends Resource
 {
     protected static ?string $model = Feature::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-numbered-list';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-numbered-list';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('plan_id')
+        return $schema
+            ->components([
+                Select::make('plan_id')
                     ->label('Plan')
                     ->relationship('plan', 'name')
                     ->searchable()
                     ->required(),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->label('Feature Name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('value')
+                TextInput::make('value')
                     ->label('Value')
                     ->required()
                     ->maxLength(255),
@@ -43,23 +55,23 @@ class FeatureResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('plan.name')->label('Plan')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('name')->label('Feature Name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('value')->label('Value')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('plan.name')->label('Plan')->sortable()->searchable(),
+                TextColumn::make('name')->label('Feature Name')->sortable()->searchable(),
+                TextColumn::make('value')->label('Value')->sortable()->searchable(),
+                TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -74,9 +86,9 @@ class FeatureResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFeatures::route('/'),
-            'create' => Pages\CreateFeature::route('/create'),
-            'edit' => Pages\EditFeature::route('/{record}/edit'),
+            'index' => ListFeatures::route('/'),
+            'create' => CreateFeature::route('/create'),
+            'edit' => EditFeature::route('/{record}/edit'),
         ];
     }
 

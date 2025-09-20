@@ -2,9 +2,17 @@
 
 namespace App\Filament\Admin\Resources\PatientResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use Carbon\Carbon;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,26 +23,26 @@ class TestRequestsRelationManager extends RelationManager
 {
     protected static string $relationship = 'testRequests';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Textarea::make('past_medical_history')
+        return $schema
+            ->components([
+                Textarea::make('past_medical_history')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('visit_purpose')
+                TextInput::make('visit_purpose')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('conclusion')
+                TextInput::make('conclusion')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('requests')
+                Textarea::make('requests')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\DatePicker::make('date')
+                DatePicker::make('date')
                     ->default(Carbon::today())
                     ->required(),
-                Forms\Components\Textarea::make('purpose')
+                Textarea::make('purpose')
                     ->required(),
             ]);
     }
@@ -44,20 +52,20 @@ class TestRequestsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('nb')
             ->columns([
-                Tables\Columns\TextColumn::make('nb'),
+                TextColumn::make('nb'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()->authorize(true),
+                CreateAction::make()->authorize(true),
 
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()->authorize(true),
-                Tables\Actions\EditAction::make()->authorize(true),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make()->authorize(true),
+                EditAction::make()->authorize(true),
+                DeleteAction::make(),
             ])
-            ->bulkActions([]);
+            ->toolbarActions([]);
     }
 }

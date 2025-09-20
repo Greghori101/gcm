@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources\PrescriptionResource\Pages;
 
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
 use App\Filament\Admin\Resources\PrescriptionResource;
 use App\Models\Prescription;
 use Filament\Actions;
@@ -14,8 +16,8 @@ class ViewPrescription extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
-            Actions\Action::make('pdf')
+            EditAction::make(),
+            Action::make('pdf')
                 ->label('PDF')
                 ->color('success')
                 ->icon('heroicon-o-document-arrow-down')

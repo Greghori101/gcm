@@ -2,6 +2,23 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Admin\Resources\TestRequestResource\Pages\ListTestRequests;
+use App\Filament\Admin\Resources\TestRequestResource\Pages\CreateTestRequest;
+use App\Filament\Admin\Resources\TestRequestResource\Pages\ViewTestRequest;
+use App\Filament\Admin\Resources\TestRequestResource\Pages\EditTestRequest;
 use App\Enums\BloodTypes;
 use App\Enums\Genders;
 use App\Models\User;
@@ -12,7 +29,6 @@ use App\Filament\Admin\Resources\TestRequestResource\Pages;
 use App\Filament\Admin\Resources\TestRequestResource\RelationManagers;
 use App\Models\TestRequest;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -26,61 +42,61 @@ class TestRequestResource extends Resource
 
     protected static ?int $navigationSort = 7;
 
-    protected static ?string $navigationIcon = 'fontisto-test-tube';
+    protected static string | \BackedEnum | null $navigationIcon = 'fontisto-test-tube';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Textarea::make('past_medical_history')
+        return $schema
+            ->components([
+                Textarea::make('past_medical_history')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('visit_purpose')
+                TextInput::make('visit_purpose')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('conclusion')
+                TextInput::make('conclusion')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('requests')
+                Textarea::make('requests')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\DatePicker::make('date')
+                DatePicker::make('date')
                     ->default(Carbon::today())
                     ->required(),
-                Forms\Components\Textarea::make('purpose')
+                Textarea::make('purpose')
                     ->required(),
-                Forms\Components\Select::make('patient_id')
+                Select::make('patient_id')
                     ->relationship('patient', 'id')
                     ->preload()
                     ->required()
                     ->createOptionForm([
-                        Forms\Components\Grid::make()->columns(2)->schema([
+                        Grid::make()->columns(2)->schema([
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('firstname')
+                                TextInput::make('firstname')
                                     ->maxLength(255)
                                     ->required()
                             )
                                 ->onlyMainLocaleRequired()
                                 ->requiredLocales(['fr', 'ar']),
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('lastname')
+                                TextInput::make('lastname')
                                     ->maxLength(255)
                                     ->required()
                             )
                                 ->onlyMainLocaleRequired()
                                 ->requiredLocales(['fr', 'ar']),
-                            Forms\Components\DatePicker::make('birthdate')
+                            DatePicker::make('birthdate')
                                 ->required()
                                 ->columnSpan(1),
-                            Forms\Components\TagsInput::make('phone_number')
+                            TagsInput::make('phone_number')
                                 ->required()
                                 ->separator(',')
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('blood_type')
+                            Select::make('blood_type')
                                 ->options(BloodTypes::toArray())
                                 ->required()
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('gender')
+                            Select::make('gender')
                                 ->options(Genders::toArray())
                                 ->required()
                                 ->columnSpan(1),
@@ -93,26 +109,26 @@ class TestRequestResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nb')
+                TextColumn::make('nb')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('date')
+                TextColumn::make('date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('visit_purpose')
+                TextColumn::make('visit_purpose')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('conclusion')
+                TextColumn::make('conclusion')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('patient_info')
+                TextColumn::make('patient_info')
                     ->label('Patient')
                     ->formatStateUsing(fn($state, $record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
                     ->getStateUsing(fn($record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
                     ->searchable(['patient.firstname', 'patient.lastname']),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -120,19 +136,19 @@ class TestRequestResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('pdf')
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('pdf')
                     ->label('PDF')
                     ->color('success')
                     ->icon('heroicon-o-document-arrow-down')
                     ->url(fn(TestRequest $record) => route('test-request-pdf', $record))
                     ->openUrlInNewTab(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -147,10 +163,10 @@ class TestRequestResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTestRequests::route('/'),
-            'create' => Pages\CreateTestRequest::route('/create'),
-            'view' => Pages\ViewTestRequest::route('/{record}'),
-            'edit' => Pages\EditTestRequest::route('/{record}/edit'),
+            'index' => ListTestRequests::route('/'),
+            'create' => CreateTestRequest::route('/create'),
+            'view' => ViewTestRequest::route('/{record}'),
+            'edit' => EditTestRequest::route('/{record}/edit'),
         ];
     }
 }

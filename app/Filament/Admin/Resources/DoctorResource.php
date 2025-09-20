@@ -2,19 +2,34 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use App\Models\User;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Admin\Resources\DoctorResource\Pages\ListDoctors;
+use App\Filament\Admin\Resources\DoctorResource\Pages\CreateDoctor;
+use App\Filament\Admin\Resources\DoctorResource\Pages\ViewDoctor;
+use App\Filament\Admin\Resources\DoctorResource\Pages\EditDoctor;
 use App\Enums\BloodTypes;
 use App\Enums\Genders;
 use App\Filament\Admin\Resources\DoctorResource\Pages;
 use App\Models\Doctor;
 use Filament\Actions\Action;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Actions\Action as FormsAction;
 
 class DoctorResource extends Resource
 {
@@ -22,37 +37,37 @@ class DoctorResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $navigationIcon = 'hugeicons-doctor-01';
+    protected static string | \BackedEnum | null $navigationIcon = 'hugeicons-doctor-01';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 SpatieMediaLibraryFileUpload::make('logo')
                     ->avatar()
                     ->imageEditor()
                     ->collection('logo')
                     ->columnSpanFull(),
                 TranslatableContainer::make(
-                    Forms\Components\TextInput::make('specialty')
+                    TextInput::make('specialty')
                         ->maxLength(255)
                         ->required()
                 )
                     ->onlyMainLocaleRequired()
                     ->requiredLocales(['fr', 'ar']),
 
-                Forms\Components\TextInput::make('national_order_number')
+                TextInput::make('national_order_number')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Select::make('user_id')
+                Select::make('user_id')
                     ->label('User')
                     ->relationship('user', 'email')
                     ->searchable()
                     ->options(function () {
-                        return \App\Models\User::whereDoesntHave('doctor')->pluck('email', 'id');
+                        return User::whereDoesntHave('doctor')->pluck('email', 'id');
                     })
                     ->createOptionForm([
-                        Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
                                 SpatieMediaLibraryFileUpload::make('avatar')
                                     ->avatar()
@@ -60,7 +75,7 @@ class DoctorResource extends Resource
                                     ->collection('avatar')
                                     ->columnSpanFull(),
                                 TranslatableContainer::make(
-                                    Forms\Components\TextInput::make('firstname')
+                                    TextInput::make('firstname')
                                         ->maxLength(255)
                                         ->required()
                                 )
@@ -68,43 +83,43 @@ class DoctorResource extends Resource
                                     ->requiredLocales(['fr', 'ar'])
                                     ->columnSpan(1),
                                 TranslatableContainer::make(
-                                    Forms\Components\TextInput::make('lastname')
+                                    TextInput::make('lastname')
                                         ->maxLength(255)
                                         ->required()
                                 )
                                     ->onlyMainLocaleRequired()
                                     ->requiredLocales(['fr', 'ar'])
                                     ->columnSpan(1),
-                                Forms\Components\DatePicker::make('birthdate')
+                                DatePicker::make('birthdate')
                                     ->required()
                                     ->columnSpan(1),
-                                Forms\Components\TagsInput::make('phone_number')
+                                TagsInput::make('phone_number')
                                     ->required()
                                     ->separator(',')
                                     ->columnSpan(1),
-                                Forms\Components\Select::make('blood_type')
+                                Select::make('blood_type')
                                     ->options(BloodTypes::toArray())
                                     ->required()
                                     ->columnSpan(1),
-                                Forms\Components\Select::make('gender')
+                                Select::make('gender')
                                     ->options(Genders::toArray())
                                     ->required()
                                     ->columnSpan(1),
-                                Forms\Components\TextInput::make('email')
+                                TextInput::make('email')
                                     ->email()
                                     ->required()
                                     ->maxLength(255)
                                     ->columnSpan(1),
-                                Forms\Components\DateTimePicker::make('email_verified_at')
+                                DateTimePicker::make('email_verified_at')
                                     ->columnSpan(1),
-                                Forms\Components\TextInput::make('password')
+                                TextInput::make('password')
                                     ->password()
                                     ->required()
                                     ->maxLength(255)
                                     ->columnSpan(1),
                             ])
                     ])
-                    ->createOptionAction(fn(FormsAction $action) => $action->modalWidth('3xl'))
+                    ->createOptionAction(fn(Action $action) => $action->modalWidth('3xl'))
                     ->required()
             ]);
     }
@@ -113,26 +128,26 @@ class DoctorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('doctor_info')
+                TextColumn::make('doctor_info')
                     ->label('Doctor')
                     ->formatStateUsing(fn($state, $record) => $record->user ? $record->user->firstname . ' ' . $record->user->lastname : '-')
                     ->getStateUsing(fn($record) => $record->user ? $record->user->firstname . ' ' . $record->user->lastname : '-')
                     ->searchable(['user.firstname', 'user.lastname']),
-                Tables\Columns\TextColumn::make('specialty')
+                TextColumn::make('specialty')
                     ->label('Specialty')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('national_order_number')
+                TextColumn::make('national_order_number')
                     ->label('National Order #')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('user.email')
+                TextColumn::make('user.email')
                     ->label('Email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Created At')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Updated At')
                     ->dateTime()
                     ->sortable()
@@ -141,13 +156,13 @@ class DoctorResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -162,10 +177,10 @@ class DoctorResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDoctors::route('/'),
-            'create' => Pages\CreateDoctor::route('/create'),
-            'view' => Pages\ViewDoctor::route('/{record}'),
-            'edit' => Pages\EditDoctor::route('/{record}/edit'),
+            'index' => ListDoctors::route('/'),
+            'create' => CreateDoctor::route('/create'),
+            'view' => ViewDoctor::route('/{record}'),
+            'edit' => EditDoctor::route('/{record}/edit'),
         ];
     }
 }

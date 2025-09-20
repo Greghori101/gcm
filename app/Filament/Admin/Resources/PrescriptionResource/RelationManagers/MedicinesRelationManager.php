@@ -2,11 +2,22 @@
 
 namespace App\Filament\Admin\Resources\PrescriptionResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DetachAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DetachBulkAction;
 use App\Models\Medicine;
 use App\Models\Form as FormModel;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,18 +28,18 @@ class MedicinesRelationManager extends RelationManager
 {
     protected static string $relationship = 'prescriptionMedicines';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Grid::make()
+        return $schema
+            ->components([
+                Grid::make()
                     ->schema([
-                        Forms\Components\Select::make('medicine_id')
+                        Select::make('medicine_id')
                             ->relationship('medicine', 'name')
                             ->required()
                             ->searchable(['name', 'brand', 'dosage'])
                             ->getSearchResultsUsing(function (string $search) {
-                                return \App\Models\Medicine::query()
+                                return Medicine::query()
                                     ->select('id', 'name', 'brand', 'dosage')
                                     ->whereRaw("CONCAT(brand, ' ', name, ' ', dosage) LIKE ?", ["%{$search}%"])
                                     ->limit(10)
@@ -47,18 +58,18 @@ class MedicinesRelationManager extends RelationManager
                             ->columnSpan(3)
                             ->getOptionLabelFromRecordUsing(fn($record) => "{$record->brand} / {$record->name} / {$record->form} / {$record->dosage}")
                             ->reactive(),
-                        Forms\Components\Toggle::make('is_qsp')
+                        Toggle::make('is_qsp')
                             ->columnSpan(1)
                             ->inline(false)
                             ->required()
                             ->reactive(),
-                        Forms\Components\TextInput::make('quantity')
+                        TextInput::make('quantity')
                             ->columnSpan(1)
                             ->numeric()
                             ->required(),
-                        Forms\Components\Hidden::make('dosage'),
-                        Forms\Components\Hidden::make('unit'),
-                        Forms\Components\TextInput::make('unit_text')
+                        Hidden::make('dosage'),
+                        Hidden::make('unit'),
+                        TextInput::make('unit_text')
                             ->columnSpan(1)
                             ->required()
                             ->maxLength(255)
@@ -66,7 +77,7 @@ class MedicinesRelationManager extends RelationManager
                             ->afterStateUpdated(function ($set, $state) {
                                 $set('unit', $state);
                             }),
-                        Forms\Components\Select::make('unit_select')
+                        Select::make('unit_select')
                             ->options(['days' => 'days', 'months' => 'months', 'weeks' => 'weeks',])
                             ->columnSpan(1)
                             ->required()
@@ -74,12 +85,12 @@ class MedicinesRelationManager extends RelationManager
                             ->afterStateUpdated(function ($set, $state) {
                                 $set('unit', $state);
                             }),
-                        Forms\Components\TextInput::make('qte')
+                        TextInput::make('qte')
                             ->numeric()
                             ->columnSpan(1)
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('form')
+                        TextInput::make('form')
                             ->datalist(function (Get $get) {
                                 $medicine = Medicine::find($get('recordId'));
                                 if (!$medicine) {
@@ -102,15 +113,15 @@ class MedicinesRelationManager extends RelationManager
                             ->columnSpan(1)
                             ->required(),
 
-                        Forms\Components\TextInput::make('frequency')
+                        TextInput::make('frequency')
                             ->columnSpan(1)
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\Select::make('periodicity')
+                        Select::make('periodicity')
                             ->options(['day' => 'day', 'month' => 'month', 'week' => 'week',])
                             ->columnSpan(1)
                             ->required(),
-                        Forms\Components\TagsInput::make('conditions')
+                        TagsInput::make('conditions')
                             ->columnSpan(2)
                             ->separator(','),
                     ])
@@ -124,19 +135,19 @@ class MedicinesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('medicine.name')
+                TextColumn::make('medicine.name')
                     ->label(__('interface.name')),
-                Tables\Columns\TextColumn::make('medicine.brand')
+                TextColumn::make('medicine.brand')
                     ->label(__('interface.brand')),
-                Tables\Columns\TextColumn::make('form')
+                TextColumn::make('form')
                     ->label(__('interface.form')),
-                Tables\Columns\TextColumn::make('dosage')
+                TextColumn::make('dosage')
                     ->label(__('interface.dosage')),
-                Tables\Columns\TextColumn::make('quantity')
+                TextColumn::make('quantity')
                     ->label(__('interface.quantity')),
-                Tables\Columns\TextColumn::make('unit')
+                TextColumn::make('unit')
                     ->label(__('interface.unit')),
-                Tables\Columns\TextColumn::make('qte')
+                TextColumn::make('qte')
                     ->label(__('interface.quantity')),
             ])
             ->filters([
@@ -144,16 +155,16 @@ class MedicinesRelationManager extends RelationManager
             ])
             ->headerActions([
                 // ...
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
             ])
-            ->actions([
+            ->recordActions([
                 // ...
-                Tables\Actions\DetachAction::make(),
+                DetachAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            ->toolbarActions([
+                BulkActionGroup::make([
                     // ...
-                    Tables\Actions\DetachBulkAction::make(),
+                    DetachBulkAction::make(),
                 ]),
             ]);
     }

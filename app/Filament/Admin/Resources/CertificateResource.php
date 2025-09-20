@@ -2,6 +2,23 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Admin\Resources\CertificateResource\Pages\ListCertificates;
+use App\Filament\Admin\Resources\CertificateResource\Pages\CreateCertificate;
+use App\Filament\Admin\Resources\CertificateResource\Pages\ViewCertificate;
+use App\Filament\Admin\Resources\CertificateResource\Pages\EditCertificate;
 use App\Enums\BloodTypes;
 use App\Enums\Genders;
 use App\Models\User;
@@ -12,7 +29,6 @@ use App\Filament\Admin\Resources\CertificateResource\Pages;
 use App\Filament\Admin\Resources\CertificateResource\RelationManagers;
 use App\Models\Certificate;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -26,55 +42,55 @@ class CertificateResource extends Resource
 
     protected static ?int $navigationSort = 6;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('period')
+        return $schema
+            ->components([
+                TextInput::make('period')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('signature')
+                TextInput::make('signature')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DatePicker::make('date')
+                DatePicker::make('date')
                     ->default(Carbon::today())
                     ->required(),
-                Forms\Components\Textarea::make('purpose')
+                Textarea::make('purpose')
                     ->required(),
-                Forms\Components\Select::make('patient_id')
+                Select::make('patient_id')
                     ->relationship('patient', 'id')
                     ->preload()
                     ->required()
                     ->createOptionForm([
-                        Forms\Components\Grid::make()->columns(2)->schema([
+                        Grid::make()->columns(2)->schema([
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('firstname')
+                                TextInput::make('firstname')
                                     ->maxLength(255)
                                     ->required()
                             )
                                 ->onlyMainLocaleRequired()
                                 ->requiredLocales(['fr', 'ar']),
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('lastname')
+                                TextInput::make('lastname')
                                     ->maxLength(255)
                                     ->required()
                             )
                                 ->onlyMainLocaleRequired()
                                 ->requiredLocales(['fr', 'ar']),
-                            Forms\Components\DatePicker::make('birthdate')
+                            DatePicker::make('birthdate')
                                 ->required()
                                 ->columnSpan(1),
-                            Forms\Components\TagsInput::make('phone_number')
+                            TagsInput::make('phone_number')
                                 ->required()
                                 ->separator(',')
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('blood_type')
+                            Select::make('blood_type')
                                 ->options(BloodTypes::toArray())
                                 ->required()
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('gender')
+                            Select::make('gender')
                                 ->options(Genders::toArray())
                                 ->required()
                                 ->columnSpan(1),
@@ -87,26 +103,26 @@ class CertificateResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nb')
+                TextColumn::make('nb')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('period')
+                TextColumn::make('period')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('date')
+                TextColumn::make('date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('signature')
+                TextColumn::make('signature')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('patient_info')
+                TextColumn::make('patient_info')
                     ->label('Patient')
                     ->formatStateUsing(fn($state, $record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
                     ->getStateUsing(fn($record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
                     ->searchable(['patient.firstname', 'patient.lastname']),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -114,19 +130,19 @@ class CertificateResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('pdf')
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('pdf')
                     ->label('PDF')
                     ->color('success')
                     ->icon('heroicon-o-document-arrow-down')
                     ->url(fn(Certificate $record) => route('certificate-pdf', $record))
                     ->openUrlInNewTab(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -141,10 +157,10 @@ class CertificateResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCertificates::route('/'),
-            'create' => Pages\CreateCertificate::route('/create'),
-            'view' => Pages\ViewCertificate::route('/{record}'),
-            'edit' => Pages\EditCertificate::route('/{record}/edit'),
+            'index' => ListCertificates::route('/'),
+            'create' => CreateCertificate::route('/create'),
+            'view' => ViewCertificate::route('/{record}'),
+            'edit' => EditCertificate::route('/{record}/edit'),
         ];
     }
 }

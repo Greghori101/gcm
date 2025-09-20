@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use App\Enums\TicketStatus;
@@ -45,7 +46,7 @@ class Ticket extends Model
         $nextNumber = $lastTicket ? $lastTicket->number + 1 : 1;
 
         return self::create([
-            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'id' => (string) Str::uuid(),
             'patient_id' => $patientId,
             'queue_id' => $queueId,
             'number' => $nextNumber,

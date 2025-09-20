@@ -2,11 +2,21 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Admin\Resources\AddressResource\Pages\ListAddresses;
+use App\Filament\Admin\Resources\AddressResource\Pages\CreateAddress;
+use App\Filament\Admin\Resources\AddressResource\Pages\ViewAddress;
+use App\Filament\Admin\Resources\AddressResource\Pages\EditAddress;
 use App\Filament\Admin\Resources\AddressResource\Pages;
 use App\Filament\Admin\Resources\AddressResource\RelationManagers;
 use App\Models\Address;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,24 +29,24 @@ class AddressResource extends Resource
 
     protected static ?int $navigationSort = 10;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map-pin';
 
     protected static ?string $recordTitleAttribute = 'country';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('country')
+        return $schema
+            ->components([
+                TextInput::make('country')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('state')
+                TextInput::make('state')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('commune')
+                TextInput::make('commune')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('city')
+                TextInput::make('city')
                     ->required()
                     ->maxLength(255)
             ]);
@@ -46,19 +56,19 @@ class AddressResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('country')
+                TextColumn::make('country')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('state')
+                TextColumn::make('state')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('commune')
+                TextColumn::make('commune')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('city')
+                TextColumn::make('city')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -66,13 +76,13 @@ class AddressResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -87,10 +97,10 @@ class AddressResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAddresses::route('/'),
-            'create' => Pages\CreateAddress::route('/create'),
-            'view' => Pages\ViewAddress::route('/{record}'),
-            'edit' => Pages\EditAddress::route('/{record}/edit'),
+            'index' => ListAddresses::route('/'),
+            'create' => CreateAddress::route('/create'),
+            'view' => ViewAddress::route('/{record}'),
+            'edit' => EditAddress::route('/{record}/edit'),
         ];
     }
 }

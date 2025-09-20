@@ -2,6 +2,27 @@
 
 namespace App\Filament\Admin\Resources;
 
+use App\Filament\Admin\Resources\PrescriptionResource\Widgets\CreatePrescriptionWidget;
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Schemas\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use App\Filament\Admin\Resources\PrescriptionResource\RelationManagers\MedicinesRelationManager;
+use App\Filament\Admin\Resources\PrescriptionResource\Pages\ListPrescriptions;
+use App\Filament\Admin\Resources\PrescriptionResource\Pages\CreatePrescription;
+use App\Filament\Admin\Resources\PrescriptionResource\Pages\ViewPrescription;
+use App\Filament\Admin\Resources\PrescriptionResource\Pages\EditPrescription;
 use App\Enums\BloodTypes;
 use App\Enums\Genders;
 use Carbon\Carbon;
@@ -12,10 +33,8 @@ use App\Models\Medicine;
 use App\Models\Prescription;
 use App\Models\Form as FormModel;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Infolists\Infolist;
 use Filament\Infolists;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -28,52 +47,52 @@ class PrescriptionResource extends Resource
 
     protected static ?int $navigationSort = 5;
 
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     public static function getWidgets(): array
     {
         return [
-            PrescriptionResource\Widgets\CreatePrescriptionWidget::class,
+            CreatePrescriptionWidget::class,
         ];
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
 
-                Forms\Components\Select::make('patient_id')
+                Select::make('patient_id')
                     ->relationship('patient', 'id')
                     ->preload()
                     ->required()
                     ->createOptionForm([
-                        Forms\Components\Grid::make()->columns(2)->schema([
+                        Grid::make()->columns(2)->schema([
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('firstname')
+                                TextInput::make('firstname')
                                     ->maxLength(255)
                                     ->required()
                             )
                                 ->onlyMainLocaleRequired()
                                 ->requiredLocales(['fr', 'ar']),
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('lastname')
+                                TextInput::make('lastname')
                                     ->maxLength(255)
                                     ->required()
                             )
                                 ->onlyMainLocaleRequired()
                                 ->requiredLocales(['fr', 'ar']),
-                            Forms\Components\DatePicker::make('birthdate')
+                            DatePicker::make('birthdate')
                                 ->required()
                                 ->columnSpan(1),
-                            Forms\Components\TagsInput::make('phone_number')
+                            TagsInput::make('phone_number')
                                 ->required()
                                 ->separator(',')
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('blood_type')
+                            Select::make('blood_type')
                                 ->options(BloodTypes::toArray())
                                 ->required()
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('gender')
+                            Select::make('gender')
                                 ->options(Genders::toArray())
                                 ->required()
                                 ->columnSpan(1),
@@ -81,11 +100,11 @@ class PrescriptionResource extends Resource
                     ])
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->firstname} {$record->lastname}")
                     ->columnSpanFull(),
-                Forms\Components\DatePicker::make('date')
+                DatePicker::make('date')
                     ->default(Carbon::today())
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('purpose')
+                Textarea::make('purpose')
                     ->required()
                     ->columnSpanFull(),
             ]);
@@ -95,22 +114,22 @@ class PrescriptionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nb')
+                TextColumn::make('nb')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('date')
+                TextColumn::make('date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('patient_info')
+                TextColumn::make('patient_info')
                     ->label('Patient')
                     ->formatStateUsing(fn($state, $record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
                     ->getStateUsing(fn($record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
                     ->searchable(['patient.firstname', 'patient.lastname']),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -118,58 +137,58 @@ class PrescriptionResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('pdf')
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('pdf')
                     ->label('PDF')
                     ->color('success')
                     ->icon('heroicon-o-document-arrow-down')
                     ->url(fn(Prescription $record) => route('prescription-pdf', $record))
                     ->openUrlInNewTab(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
-                Infolists\Components\Section::make()->columns(3) // Two columns
+        return $schema
+            ->components([
+                Section::make()->columns(3) // Two columns
                     ->schema([
-                        Infolists\Components\TextEntry::make('patient.firstname')
+                        TextEntry::make('patient.firstname')
                             ->label('First Name')
                             ->inlineLabel(true)
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('patient.lastname')
+                        TextEntry::make('patient.lastname')
                             ->label('Last Name')
                             ->inlineLabel(true)
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('patient.birthdate')
+                        TextEntry::make('patient.birthdate')
                             ->label('Birthdate')
                             ->inlineLabel(true)
                             ->date()
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('patient.phone_number')
+                        TextEntry::make('patient.phone_number')
                             ->label('Phone Number')
                             ->inlineLabel(true)
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('patient.blood_type')
+                        TextEntry::make('patient.blood_type')
                             ->inlineLabel(true)
                             ->label('Blood Type')
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('patient.gender')
+                        TextEntry::make('patient.gender')
                             ->inlineLabel(true)
                             ->label('Gender')
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('date')
+                        TextEntry::make('date')
                             ->label('Date')
                             ->date()
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('purpose')
+                        TextEntry::make('purpose')
                             ->label('Purpose')
                             ->columnSpan(2),
                     ]),
@@ -179,17 +198,17 @@ class PrescriptionResource extends Resource
     {
         return [
             //
-            RelationManagers\MedicinesRelationManager::class,
+            MedicinesRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPrescriptions::route('/'),
-            'create' => Pages\CreatePrescription::route('/create'),
-            'view' => Pages\ViewPrescription::route('/{record}'),
-            'edit' => Pages\EditPrescription::route('/{record}/edit'),
+            'index' => ListPrescriptions::route('/'),
+            'create' => CreatePrescription::route('/create'),
+            'view' => ViewPrescription::route('/{record}'),
+            'edit' => EditPrescription::route('/{record}/edit'),
         ];
     }
 }

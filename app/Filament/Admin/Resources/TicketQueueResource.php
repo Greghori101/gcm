@@ -2,11 +2,19 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Admin\Resources\TicketQueueResource\Pages\ListTicketQueues;
+use App\Filament\Admin\Resources\TicketQueueResource\Pages\CreateTicketQueue;
+use App\Filament\Admin\Resources\TicketQueueResource\Pages\EditTicketQueue;
 use App\Filament\Admin\Resources\TicketQueueResource\Pages;
 use App\Filament\Admin\Resources\TicketQueueResource\RelationManagers;
 use App\Models\TicketQueue;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,17 +25,17 @@ class TicketQueueResource extends Resource
 {
     protected static ?string $model = TicketQueue::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-queue-list';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-queue-list';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->label('Queue Name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('priority')
+                TextInput::make('priority')
                     ->label('Priority')
                     ->numeric()
                     ->required(),
@@ -38,23 +46,23 @@ class TicketQueueResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->label('Queue Name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('priority')->label('Priority')->sortable(),
-                Tables\Columns\TextColumn::make('waiting_count')
+                TextColumn::make('name')->label('Queue Name')->sortable()->searchable(),
+                TextColumn::make('priority')->label('Priority')->sortable(),
+                TextColumn::make('waiting_count')
                     ->label('Waiting Count')
                     ->getStateUsing(fn($record) => $record->waitingCount()),
-                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -69,9 +77,9 @@ class TicketQueueResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTicketQueues::route('/'),
-            'create' => Pages\CreateTicketQueue::route('/create'),
-            'edit' => Pages\EditTicketQueue::route('/{record}/edit'),
+            'index' => ListTicketQueues::route('/'),
+            'create' => CreateTicketQueue::route('/create'),
+            'edit' => EditTicketQueue::route('/{record}/edit'),
         ];
     }
 }

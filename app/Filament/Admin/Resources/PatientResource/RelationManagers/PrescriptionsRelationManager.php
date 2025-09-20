@@ -2,12 +2,25 @@
 
 namespace App\Filament\Admin\Resources\PatientResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use App\Models\Medicine;
 use App\Models\Form as FormModel;
 use Carbon\Carbon;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,29 +31,29 @@ class PrescriptionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'prescriptions';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
 
-                Forms\Components\DatePicker::make('date')
+                DatePicker::make('date')
                     ->default(Carbon::today())
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('purpose')
+                Textarea::make('purpose')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\Repeater::make('prescriptionMedicines')
+                Repeater::make('prescriptionMedicines')
                     ->relationship()
                     ->cloneable()
                     ->schema([
-                        Forms\Components\Select::make('medicine_id')
+                        Select::make('medicine_id')
                             ->relationship('medicine', 'name')
                             ->required()
                             ->searchable(['name', 'brand', 'dosage'])
 
                             ->getSearchResultsUsing(function (string $search) {
-                                return \App\Models\Medicine::query()
+                                return Medicine::query()
                                     ->select('id', 'name', 'brand', 'dosage')
                                     ->whereRaw("CONCAT(brand, ' ', name, ' ', dosage) LIKE ?", ["%{$search}%"])
                                     ->limit(10)
@@ -59,18 +72,18 @@ class PrescriptionsRelationManager extends RelationManager
                             ->columnSpan(3)
                             ->getOptionLabelFromRecordUsing(fn($record) => "{$record->brand} / {$record->name} / {$record->form} / {$record->dosage}")
                             ->reactive(),
-                        Forms\Components\Toggle::make('is_qsp')
+                        Toggle::make('is_qsp')
                             ->columnSpan(1)
                             ->inline(false)
                             ->required()
                             ->reactive(),
-                        Forms\Components\TextInput::make('quantity')
+                        TextInput::make('quantity')
                             ->columnSpan(1)
                             ->numeric()
                             ->required(),
-                        Forms\Components\Hidden::make('dosage'),
-                        Forms\Components\Hidden::make('unit'),
-                        Forms\Components\TextInput::make('unit_text')
+                        Hidden::make('dosage'),
+                        Hidden::make('unit'),
+                        TextInput::make('unit_text')
                             ->columnSpan(1)
                             ->required()
                             ->maxLength(255)
@@ -78,7 +91,7 @@ class PrescriptionsRelationManager extends RelationManager
                             ->afterStateUpdated(function ($set, $state) {
                                 $set('unit', $state);
                             }),
-                        Forms\Components\Select::make('unit_select')
+                        Select::make('unit_select')
                             ->options(['days' => 'days', 'months' => 'months', 'weeks' => 'weeks',])
                             ->columnSpan(1)
                             ->required()
@@ -86,12 +99,12 @@ class PrescriptionsRelationManager extends RelationManager
                             ->afterStateUpdated(function ($set, $state) {
                                 $set('unit', $state);
                             }),
-                        Forms\Components\TextInput::make('qte')
+                        TextInput::make('qte')
                             ->numeric()
                             ->columnSpan(1)
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('form')
+                        TextInput::make('form')
                             ->datalist(function (Get $get) {
                                 $medicine = Medicine::find($get('medicine_id'));
                                 if (!$medicine) {
@@ -113,15 +126,15 @@ class PrescriptionsRelationManager extends RelationManager
                             })
                             ->columnSpan(1)
                             ->required(),
-                        Forms\Components\TextInput::make('frequency')
+                        TextInput::make('frequency')
                             ->columnSpan(1)
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\Select::make('periodicity')
+                        Select::make('periodicity')
                             ->options(['day' => 'day', 'month' => 'month', 'week' => 'week',])
                             ->columnSpan(1)
                             ->required(),
-                        Forms\Components\TagsInput::make('conditions')
+                        TagsInput::make('conditions')
                             ->columnSpan(2)
                             ->separator(','),
                     ])
@@ -138,19 +151,19 @@ class PrescriptionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('nb')
             ->columns([
-                Tables\Columns\TextColumn::make('nb'),
+                TextColumn::make('nb'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()->authorize(true),
+                CreateAction::make()->authorize(true),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()->authorize(true),
-                Tables\Actions\EditAction::make()->authorize(true),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make()->authorize(true),
+                EditAction::make()->authorize(true),
+                DeleteAction::make(),
             ])
-            ->bulkActions([]);
+            ->toolbarActions([]);
     }
 }

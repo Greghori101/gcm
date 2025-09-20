@@ -6,7 +6,7 @@ use Filament\Pages\Page;
 
 class Pending extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string $view = 'filament.admin.pages.pending';
+    protected string $view = 'filament.admin.pages.pending';
 }

@@ -2,6 +2,13 @@
 
 namespace App\Filament\Admin\Resources\PrescriptionResource\Widgets;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Textarea;
 use App\Enums\BloodTypes;
 use App\Enums\Genders;
 use App\Models\Patient;
@@ -11,14 +18,13 @@ use Filament\Widgets\Widget;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Form;
 use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
 
 class CreatePrescriptionWidget extends Widget implements HasForms
 {
     use InteractsWithForms;
 
-    protected static string $view = 'filament.admin.resources.prescription-resource.widgets.create-prescription-widget';
+    protected string $view = 'filament.admin.resources.prescription-resource.widgets.create-prescription-widget';
 
     protected int | string | array $columnSpan = 'full';
 
@@ -29,11 +35,11 @@ class CreatePrescriptionWidget extends Widget implements HasForms
         $this->form->fill();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('patient_id')
+        return $schema
+            ->components([
+                Select::make('patient_id')
                     ->label('Patient')
                     ->options(
                         Patient::query()
@@ -46,33 +52,33 @@ class CreatePrescriptionWidget extends Widget implements HasForms
                     ->preload()
                     ->required()
                     ->createOptionForm([
-                        Forms\Components\Grid::make()->columns(2)->schema([
+                        Grid::make()->columns(2)->schema([
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('firstname')
+                                TextInput::make('firstname')
                                     ->maxLength(255)
                                     ->required()
                             )
                                 ->onlyMainLocaleRequired()
                                 ->requiredLocales(['fr', 'ar']),
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('lastname')
+                                TextInput::make('lastname')
                                     ->maxLength(255)
                                     ->required()
                             )
                                 ->onlyMainLocaleRequired()
                                 ->requiredLocales(['fr', 'ar']),
-                            Forms\Components\DatePicker::make('birthdate')
+                            DatePicker::make('birthdate')
                                 ->required()
                                 ->columnSpan(1),
-                            Forms\Components\TagsInput::make('phone_number')
+                            TagsInput::make('phone_number')
                                 ->required()
                                 ->separator(',')
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('blood_type')
+                            Select::make('blood_type')
                                 ->options(BloodTypes::toArray())
                                 ->required()
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('gender')
+                            Select::make('gender')
                                 ->options(Genders::toArray())
                                 ->required()
                                 ->columnSpan(1),
@@ -85,11 +91,11 @@ class CreatePrescriptionWidget extends Widget implements HasForms
                     })
                     ->columnSpanFull(),
 
-                Forms\Components\DatePicker::make('date')
+                DatePicker::make('date')
                     ->default(Carbon::today())
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('purpose')
+                Textarea::make('purpose')
                     ->required()
                     ->columnSpanFull(),
             ])

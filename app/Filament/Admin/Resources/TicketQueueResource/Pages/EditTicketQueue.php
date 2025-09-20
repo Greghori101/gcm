@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\TicketQueueResource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Admin\Resources\TicketQueueResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,7 +14,7 @@ class EditTicketQueue extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

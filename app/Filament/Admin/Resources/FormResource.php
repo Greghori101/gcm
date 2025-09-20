@@ -2,12 +2,21 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Admin\Resources\FormResource\Pages\ListForms;
+use App\Filament\Admin\Resources\FormResource\Pages\CreateForm;
+use App\Filament\Admin\Resources\FormResource\Pages\EditForm;
 use App\Filament\Admin\Resources\FormResource\Pages;
 use App\Filament\Admin\Resources\FormResource\RelationManagers;
 use App\Models\Form as FormModel;
 use App\Models\Medicine;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,14 +27,14 @@ class FormResource extends Resource
 {
     protected static ?string $model = FormModel::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-beaker';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-beaker';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 //
-                Forms\Components\Select::make('form')
+                Select::make('form')
                     ->options(fn() => Medicine::query()
                         ->select('form')
                         ->distinct()
@@ -34,7 +43,7 @@ class FormResource extends Resource
                     ->columnSpan(1)
                     ->required(),
 
-                Forms\Components\TagsInput::make('notations')
+                TagsInput::make('notations')
                     ->columnSpan(1)
                     ->required()
                     ->separator(','),
@@ -45,22 +54,22 @@ class FormResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('form')
+                TextColumn::make('form')
                     ->label('Form')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('notations')
+                TextColumn::make('notations')
                     ->label('Notations')
                     ->formatStateUsing(fn($state) => is_array($state) ? implode(', ', $state) : $state),
             ])
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -75,9 +84,9 @@ class FormResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListForms::route('/'),
-            'create' => Pages\CreateForm::route('/create'),
-            'edit' => Pages\EditForm::route('/{record}/edit'),
+            'index' => ListForms::route('/'),
+            'create' => CreateForm::route('/create'),
+            'edit' => EditForm::route('/{record}/edit'),
         ];
     }
 }

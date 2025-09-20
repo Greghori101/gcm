@@ -2,13 +2,29 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Tables\Columns\TextColumn;
+use App\Enums\UserStatus;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Admin\Resources\UserResource\Pages\ListUsers;
+use App\Filament\Admin\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Admin\Resources\UserResource\Pages\ViewUser;
+use App\Filament\Admin\Resources\UserResource\Pages\EditUser;
 use App\Enums\BloodTypes;
 use App\Enums\Genders;
 use App\Filament\Admin\Resources\UserResource\Pages;
 use App\Filament\Admin\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,49 +39,49 @@ class UserResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $recordTitleAttribute = 'lastname';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 SpatieMediaLibraryFileUpload::make('avatar')
                     ->avatar()
                     ->imageEditor()
                     ->collection('avatar'),
                 TranslatableContainer::make(
-                    Forms\Components\TextInput::make('firstname')
+                    TextInput::make('firstname')
                         ->maxLength(255)
                         ->required()
                 )
                     ->onlyMainLocaleRequired()
                     ->requiredLocales(['fr', 'ar']),
                 TranslatableContainer::make(
-                    Forms\Components\TextInput::make('lastname')
+                    TextInput::make('lastname')
                         ->maxLength(255)
                         ->required()
                 )
                     ->onlyMainLocaleRequired()
                     ->requiredLocales(['fr', 'ar']),
-                Forms\Components\DatePicker::make('birthdate')
+                DatePicker::make('birthdate')
                     ->required(),
-                Forms\Components\TagsInput::make('phone_number')
+                TagsInput::make('phone_number')
                     ->required()
                     ->separator(','),
-                Forms\Components\Select::make('blood_type')
+                Select::make('blood_type')
                     ->options(BloodTypes::toArray())
                     ->required(),
-                Forms\Components\Select::make('gender')
+                Select::make('gender')
                     ->options(Genders::toArray())
                     ->required(),
-                Forms\Components\TextInput::make('email')
+                TextInput::make('email')
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
+                DateTimePicker::make('email_verified_at'),
+                TextInput::make('password')
                     ->password()
                     ->required()
                     ->maxLength(255),
@@ -76,25 +92,25 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('firstname')
+                TextColumn::make('firstname')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('lastname')
+                TextColumn::make('lastname')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('birthdate')
+                TextColumn::make('birthdate')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('phone_number')
+                TextColumn::make('phone_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('blood_type')
+                TextColumn::make('blood_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('gender')
+                TextColumn::make('gender')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
+                TextColumn::make('email_verified_at')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->colors([
@@ -102,26 +118,26 @@ class UserResource extends Resource
                         'warning' => fn($state) => $state === 'pending',
                         'danger' => fn($state) => $state === 'blocked',
                     ])
-                    ->formatStateUsing(fn($state) => \App\Enums\UserStatus::toArray()[$state] ?? $state),
-                Tables\Columns\TextColumn::make('created_at')
+                    ->formatStateUsing(fn($state) => UserStatus::toArray()[$state] ?? $state),
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('activate')
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('activate')
                     ->label('Activate')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn($record) => $record->status !== 'active')
                     ->action(fn($record) => $record->update(['status' => 'active'])),
-                Tables\Actions\Action::make('block')
+                Action::make('block')
                     ->label('Block')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -131,13 +147,13 @@ class UserResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -152,10 +168,10 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'view' => Pages\ViewUser::route('/{record}'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
+            'view' => ViewUser::route('/{record}'),
+            'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 }

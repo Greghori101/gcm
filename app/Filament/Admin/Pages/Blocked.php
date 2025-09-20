@@ -6,7 +6,7 @@ use Filament\Pages\Page;
 
 class Blocked extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string $view = 'filament.admin.pages.blocked';
+    protected string $view = 'filament.admin.pages.blocked';
 }

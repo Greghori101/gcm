@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\PrescriptionResource\Pages;
 
+use App\Filament\Admin\Resources\PrescriptionResource\Widgets\CreatePrescriptionWidget;
 use App\Filament\Admin\Resources\PrescriptionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -19,7 +20,7 @@ class ListPrescriptions extends ListRecords
     protected function getHeaderWidgets(): array
     {
         return [
-            PrescriptionResource\Widgets\CreatePrescriptionWidget::class,
+            CreatePrescriptionWidget::class,
         ];
     }
 }

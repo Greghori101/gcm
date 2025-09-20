@@ -2,11 +2,21 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Admin\Resources\TicketResource\Pages\ListTickets;
+use App\Filament\Admin\Resources\TicketResource\Pages\CreateTicket;
+use App\Filament\Admin\Resources\TicketResource\Pages\EditTicket;
 use App\Filament\Admin\Resources\TicketResource\Pages;
 use App\Filament\Admin\Resources\TicketResource\RelationManagers;
 use App\Models\Ticket;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,30 +27,30 @@ class TicketResource extends Resource
 {
     protected static ?string $model = Ticket::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-ticket';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-ticket';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('patient_id')
+        return $schema
+            ->components([
+                Select::make('patient_id')
                     ->label('Patient')
                     ->relationship('patient', 'id')
                     ->searchable()
                     ->required(),
-                Forms\Components\Select::make('queue_id')
+                Select::make('queue_id')
                     ->label('Queue')
                     ->relationship('queue', 'name')
                     ->searchable()
                     ->required(),
-                Forms\Components\TextInput::make('number')
+                TextInput::make('number')
                     ->label('Ticket Number')
                     ->numeric()
                     ->required(),
-                Forms\Components\DatePicker::make('ticket_date')
+                DatePicker::make('ticket_date')
                     ->label('Ticket Date')
                     ->required(),
-                Forms\Components\Select::make('status')
+                Select::make('status')
                     ->label('Status')
                     ->options([
                         'pending' => 'Pending',
@@ -56,28 +66,28 @@ class TicketResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('patient_info')
+                TextColumn::make('patient_info')
                     ->label('Patient')
                     ->formatStateUsing(fn($state, $record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
                     ->getStateUsing(fn($record) => $record->patient ? $record->patient->firstname . ' ' . $record->patient->lastname : '-')
                     ->sortable()
                     ->searchable(['patient.firstname', 'patient.lastname']),
-                Tables\Columns\TextColumn::make('queue.name')->label('Queue')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('number')->label('Ticket Number')->sortable(),
-                Tables\Columns\TextColumn::make('ticket_date')->label('Ticket Date')->date()->sortable(),
-                Tables\Columns\TextColumn::make('status')->label('Status')->sortable(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('queue.name')->label('Queue')->sortable()->searchable(),
+                TextColumn::make('number')->label('Ticket Number')->sortable(),
+                TextColumn::make('ticket_date')->label('Ticket Date')->date()->sortable(),
+                TextColumn::make('status')->label('Status')->sortable(),
+                TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -92,9 +102,9 @@ class TicketResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTickets::route('/'),
-            'create' => Pages\CreateTicket::route('/create'),
-            'edit' => Pages\EditTicket::route('/{record}/edit'),
+            'index' => ListTickets::route('/'),
+            'create' => CreateTicket::route('/create'),
+            'edit' => EditTicket::route('/{record}/edit'),
         ];
     }
 }

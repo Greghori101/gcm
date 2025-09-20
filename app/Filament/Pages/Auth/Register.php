@@ -2,19 +2,27 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Enums\SubscriptionStatus;
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Hidden;
+use App\Enums\Roles;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Select;
+use App\Enums\BloodTypes;
+use App\Enums\Genders;
 use App\Models\Plan;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Form;
-use Filament\Pages\Auth\Register as BaseRegister;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\Radio;
 use Mvenghaus\FilamentPluginTranslatableInline\Forms\Components\TranslatableContainer;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 
-class Register extends BaseRegister
+class Register extends \Filament\Auth\Pages\Register
 {
 
     protected function handleRegistration(array $data): Model
@@ -53,18 +61,18 @@ class Register extends BaseRegister
             'plan_id' => $data['plan_id'],
             'start_date' => now(),
             'end_date' => now()->addYear(),
-            'status' => \App\Enums\SubscriptionStatus::Pending,
+            'status' => SubscriptionStatus::Pending,
         ]);
 
         return $user;
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Forms\Components\Hidden::make('role')->default(\App\Enums\Roles::DOCTOR->value),
-            Forms\Components\Wizard::make([
-                Forms\Components\Wizard\Step::make('Account')
+        return $schema->components([
+            Hidden::make('role')->default(Roles::DOCTOR->value),
+            Wizard::make([
+                Step::make('Account')
                     ->schema([
                         Grid::make(2)->schema([
                             Radio::make('plan_id')
@@ -76,7 +84,7 @@ class Register extends BaseRegister
                                 ->columnSpanFull()
                                 ->required(),
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('firstname')
+                                TextInput::make('firstname')
                                     ->maxLength(255)
                                     ->required()
                             )
@@ -84,7 +92,7 @@ class Register extends BaseRegister
                                 ->requiredLocales(['fr', 'ar'])
                                 ->columnSpan(1),
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('lastname')
+                                TextInput::make('lastname')
                                     ->maxLength(255)
                                     ->required()
                             )
@@ -96,17 +104,17 @@ class Register extends BaseRegister
 
                             TextInput::make('birthdate')->label('Birthdate')->type('date')->required()
                                 ->columnSpan(1),
-                            Forms\Components\TagsInput::make('phone_number')
+                            TagsInput::make('phone_number')
                                 ->required()
                                 ->separator(','),
-                            Forms\Components\Select::make('blood_type')
+                            Select::make('blood_type')
                                 ->label('Blood Type')
-                                ->options(\App\Enums\BloodTypes::toArray())
+                                ->options(BloodTypes::toArray())
                                 ->required()
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('gender')
+                            Select::make('gender')
                                 ->label('Gender')
-                                ->options(\App\Enums\Genders::toArray())
+                                ->options(Genders::toArray())
                                 ->required()
                                 ->columnSpan(1),
                             TextInput::make('email')->label('Email')->email()->required()->maxLength(255)
@@ -118,11 +126,11 @@ class Register extends BaseRegister
                         ]),
 
                     ]),
-                Forms\Components\Wizard\Step::make('Doctor')
+                Step::make('Doctor')
                     ->schema([
                         Grid::make(2)->schema([
                             TranslatableContainer::make(
-                                Forms\Components\TextInput::make('specialty')
+                                TextInput::make('specialty')
                                     ->maxLength(255)
                                     ->required()
                             )

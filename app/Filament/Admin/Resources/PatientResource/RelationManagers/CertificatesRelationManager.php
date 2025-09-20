@@ -2,9 +2,17 @@
 
 namespace App\Filament\Admin\Resources\PatientResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use Carbon\Carbon;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,20 +23,20 @@ class CertificatesRelationManager extends RelationManager
 {
     protected static string $relationship = 'certificates';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('period')
+        return $schema
+            ->components([
+                TextInput::make('period')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('signature')
+                TextInput::make('signature')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DatePicker::make('date')
+                DatePicker::make('date')
                     ->default(Carbon::today())
                     ->required(),
-                Forms\Components\Textarea::make('purpose')
+                Textarea::make('purpose')
                     ->required(),
             ]);
     }
@@ -38,20 +46,20 @@ class CertificatesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('nb')
             ->columns([
-                Tables\Columns\TextColumn::make('nb'),
+                TextColumn::make('nb'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()->authorize(true),
+                CreateAction::make()->authorize(true),
 
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()->authorize(true),
-                Tables\Actions\EditAction::make()->authorize(true),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make()->authorize(true),
+                EditAction::make()->authorize(true),
+                DeleteAction::make(),
             ])
-            ->bulkActions([]);
+            ->toolbarActions([]);
     }
 }

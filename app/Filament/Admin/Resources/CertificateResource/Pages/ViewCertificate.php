@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources\CertificateResource\Pages;
 
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
 use App\Filament\Admin\Resources\CertificateResource;
 use App\Models\Certificate;
 use Filament\Actions;
@@ -14,8 +16,8 @@ class ViewCertificate extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
-            Actions\Action::make('pdf')
+            EditAction::make(),
+            Action::make('pdf')
                 ->label('PDF')
                 ->color('success')
                 ->icon('heroicon-o-document-arrow-down')
