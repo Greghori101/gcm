@@ -2,11 +2,9 @@
 
 namespace App\Filament\Admin\Pages;
 
-use Filament\Pages\Page;
+use Filament\Pages\SimplePage;
 
-class Pending extends Page
+class Pending extends SimplePage
 {
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
-
     protected string $view = 'filament.admin.pages.pending';
 }

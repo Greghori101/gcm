@@ -48,13 +48,11 @@ class DoctorResource extends Resource
                     ->imageEditor()
                     ->collection('logo')
                     ->columnSpanFull(),
-                TranslatableContainer::make(
-                    TextInput::make('specialty')
-                        ->maxLength(255)
-                        ->required()
-                )
-                    ->onlyMainLocaleRequired()
-                    ->requiredLocales(['fr', 'ar']),
+                TextInput::make('specialty')
+                    ->maxLength(255)
+                    ->translatableTabs()
+
+                    ->required(),
 
                 TextInput::make('national_order_number')
                     ->required()
@@ -74,21 +72,15 @@ class DoctorResource extends Resource
                                     ->imageEditor()
                                     ->collection('avatar')
                                     ->columnSpanFull(),
-                                TranslatableContainer::make(
                                     TextInput::make('firstname')
                                         ->maxLength(255)
                                         ->required()
-                                )
-                                    ->onlyMainLocaleRequired()
-                                    ->requiredLocales(['fr', 'ar'])
+                                         ->translatableTabs()
                                     ->columnSpan(1),
-                                TranslatableContainer::make(
                                     TextInput::make('lastname')
                                         ->maxLength(255)
+                                    ->translatableTabs()
                                         ->required()
-                                )
-                                    ->onlyMainLocaleRequired()
-                                    ->requiredLocales(['fr', 'ar'])
                                     ->columnSpan(1),
                                 DatePicker::make('birthdate')
                                     ->required()

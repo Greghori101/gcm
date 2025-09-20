@@ -71,20 +71,14 @@ class TestRequestResource extends Resource
                     ->required()
                     ->createOptionForm([
                         Grid::make()->columns(2)->schema([
-                            TranslatableContainer::make(
                                 TextInput::make('firstname')
                                     ->maxLength(255)
                                     ->required()
-                            )
-                                ->onlyMainLocaleRequired()
-                                ->requiredLocales(['fr', 'ar']),
-                            TranslatableContainer::make(
+                                    ->translatableTabs(),
                                 TextInput::make('lastname')
                                     ->maxLength(255)
                                     ->required()
-                            )
-                                ->onlyMainLocaleRequired()
-                                ->requiredLocales(['fr', 'ar']),
+                                    ->translatableTabs(),
                             DatePicker::make('birthdate')
                                 ->required()
                                 ->columnSpan(1),

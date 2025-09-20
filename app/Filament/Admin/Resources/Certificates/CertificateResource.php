@@ -65,20 +65,14 @@ class CertificateResource extends Resource
                     ->required()
                     ->createOptionForm([
                         Grid::make()->columns(2)->schema([
-                            TranslatableContainer::make(
                                 TextInput::make('firstname')
+                                    ->translatableTabs()
                                     ->maxLength(255)
-                                    ->required()
-                            )
-                                ->onlyMainLocaleRequired()
-                                ->requiredLocales(['fr', 'ar']),
-                            TranslatableContainer::make(
+                                    ->required(),
                                 TextInput::make('lastname')
+                                    ->translatableTabs()
                                     ->maxLength(255)
-                                    ->required()
-                            )
-                                ->onlyMainLocaleRequired()
-                                ->requiredLocales(['fr', 'ar']),
+                                    ->required(),
                             DatePicker::make('birthdate')
                                 ->required()
                                 ->columnSpan(1),

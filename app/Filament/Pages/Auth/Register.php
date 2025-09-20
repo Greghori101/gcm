@@ -83,21 +83,16 @@ class Register extends \Filament\Auth\Pages\Register
                                 ->inlineLabel(false)
                                 ->columnSpanFull()
                                 ->required(),
-                            TranslatableContainer::make(
-                                TextInput::make('firstname')
-                                    ->maxLength(255)
-                                    ->required()
-                            )
-                                ->onlyMainLocaleRequired()
-                                ->requiredLocales(['fr', 'ar'])
+                            TextInput::make('firstname')
+                                ->maxLength(255)
+                                ->required()
+                                ->translatableTabs()
                                 ->columnSpan(1),
-                            TranslatableContainer::make(
-                                TextInput::make('lastname')
-                                    ->maxLength(255)
-                                    ->required()
-                            )
-                                ->onlyMainLocaleRequired()
-                                ->requiredLocales(['fr', 'ar'])
+                            TextInput::make('lastname')
+                                ->maxLength(255)
+                                ->required()
+                                ->translatableTabs()
+
                                 ->columnSpan(1),
 
 
@@ -129,13 +124,10 @@ class Register extends \Filament\Auth\Pages\Register
                 Step::make('Doctor')
                     ->schema([
                         Grid::make(2)->schema([
-                            TranslatableContainer::make(
-                                TextInput::make('specialty')
-                                    ->maxLength(255)
-                                    ->required()
-                            )
-                                ->onlyMainLocaleRequired()
-                                ->requiredLocales(['fr', 'ar'])
+                            TextInput::make('specialty')
+                                ->maxLength(255)
+                                ->required()
+                                ->translatableTabs()
                                 ->columnSpan(1),
                             TextInput::make('national_order_number')->label('National Order Number')->required()->maxLength(255)
                                 ->columnSpan(1),

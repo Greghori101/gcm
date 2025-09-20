@@ -4,8 +4,78 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ce9c8d936106bce4234663b29b3152e7",
+    "content-hash": "e338739f6ad9a62efbfd6d061e952311",
     "packages": [
+        {
+            "name": "abdulmajeed-jamaan/filament-translatable-tabs",
+            "version": "v4.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Abdulmajeed-Jamaan/filament-translatable-tabs.git",
+                "reference": "15e6821a83c49997c7757df9a587928bbf68cbf2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Abdulmajeed-Jamaan/filament-translatable-tabs/zipball/15e6821a83c49997c7757df9a587928bbf68cbf2",
+                "reference": "15e6821a83c49997c7757df9a587928bbf68cbf2",
+                "shasum": ""
+            },
+            "require": {
+                "filament/forms": "^4.0",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0",
+                "pestphp/pest": "^3.8"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": [],
+                    "providers": [
+                        "AbdulmajeedJamaan\\FilamentTranslatableTabs\\FilamentTranslatableTabsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AbdulmajeedJamaan\\FilamentTranslatableTabs\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Abdulmajeed-Jamaan",
+                    "email": "abdulmajeed.jamaan@outlook.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Simplifying managing json based translation columns using tabs",
+            "homepage": "https://github.com/abdulmajeed-jamaan/filament-translatable-tabs",
+            "keywords": [
+                "Abdulmajeed-Jamaan",
+                "filament",
+                "filament-translatable-tabs",
+                "laravel",
+                "translation"
+            ],
+            "support": {
+                "issues": "https://github.com/abdulmajeed-jamaan/filament-translatable-tabs/issues",
+                "source": "https://github.com/abdulmajeed-jamaan/filament-translatable-tabs"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Abdulmajeed-Jamaan",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-07-30T18:18:05+00:00"
+        },
         {
             "name": "afatmustafa/blade-hugeicons",
             "version": "v1.0.2",
@@ -2666,27 +2736,28 @@
         },
         {
             "name": "jaocero/radio-deck",
-            "version": "v1.3",
+            "version": "v2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/199ocero/radio-deck.git",
-                "reference": "453d25f14a2666dddfa025ab0ada7edf0d47ee25"
+                "reference": "15b72137cdc0e91e8f0b98f1f0f7d3f0e1c209b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/199ocero/radio-deck/zipball/453d25f14a2666dddfa025ab0ada7edf0d47ee25",
-                "reference": "453d25f14a2666dddfa025ab0ada7edf0d47ee25",
+                "url": "https://api.github.com/repos/199ocero/radio-deck/zipball/15b72137cdc0e91e8f0b98f1f0f7d3f0e1c209b4",
+                "reference": "15b72137cdc0e91e8f0b98f1f0f7d3f0e1c209b4",
                 "shasum": ""
             },
             "require": {
-                "filament/forms": "^3.0 | ^4.0",
-                "illuminate/contracts": "^10.0 | ^11.0 | ^12.0",
-                "php": "^8.1",
+                "filament/forms": "^4.0",
+                "illuminate/contracts": "^11.0|^12.0",
+                "php": "^8.2",
                 "spatie/laravel-package-tools": "^1.15.0"
             },
             "require-dev": {
-                "nunomaduro/collision": "^7.9",
-                "orchestra/testbench": "^8.0 | ^9.0",
+                "laravel/pint": "^1.24",
+                "nunomaduro/collision": "^8.1",
+                "orchestra/testbench": "^9.0",
                 "pestphp/pest": "^2.0",
                 "pestphp/pest-plugin-arch": "^2.0",
                 "pestphp/pest-plugin-laravel": "^2.0"
@@ -2736,7 +2807,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-08-22T00:45:45+00:00"
+            "time": "2025-09-14T12:02:21+00:00"
         },
         {
             "name": "khatabwedaa/blade-css-icons",

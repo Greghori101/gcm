@@ -47,20 +47,14 @@ class PatientResource extends Resource
         return $schema
             ->components([
                 Grid::make()->columns(2)->schema([
-                    TranslatableContainer::make(
-                        TextInput::make('firstname')
-                            ->maxLength(255)
-                            ->required()
-                    )
-                        ->onlyMainLocaleRequired()
-                        ->requiredLocales(['fr', 'ar']),
-                    TranslatableContainer::make(
-                        TextInput::make('lastname')
-                            ->maxLength(255)
-                            ->required()
-                    )
-                        ->onlyMainLocaleRequired()
-                        ->requiredLocales(['fr', 'ar']),
+                    TextInput::make('firstname')
+                        ->maxLength(255)
+                        ->translatableTabs()
+                        ->required(),
+                    TextInput::make('lastname')
+                        ->maxLength(255)
+                        ->required()
+                        ->translatableTabs(),
                     DatePicker::make('birthdate')
                         ->required()
                         ->columnSpan(1),

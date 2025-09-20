@@ -2,11 +2,9 @@
 
 namespace App\Filament\Admin\Pages;
 
-use Filament\Pages\Page;
+use Filament\Pages\SimplePage;
 
-class Blocked extends Page
+class Blocked extends SimplePage
 {
-    protected static string | null $navigationIcon = 'heroicon-o-document-text';
-
     protected string $view = 'filament.admin.pages.blocked';
 }
