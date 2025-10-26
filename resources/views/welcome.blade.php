@@ -220,56 +220,26 @@
                 </p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 flex-1">
-                <!-- Bronze Plan -->
-                <div class="bg-white border-2 border-sky-200 p-8 rounded-2xl text-center">
-                    <h4 class="text-2xl font-bold mb-2 text-sky-700">Bronze Plan</h4>
-                    <p class="mb-4 text-gray-600">For small clinics and independent doctors</p>
-                    <ul class="mb-6 text-gray-700 space-y-2 text-left block">
-                        <li>Patient profile creation & management</li>
-                        <li>Access to patient medical history</li>
-                        <li>Appointment scheduling & reminders</li>
-                        <li>Basic analytics (visits count, patient growth)</li>
-                        <li>Secure file storage (1 GB)</li>
-                        <li>Up to 200 patients</li>
-                    </ul>
-                    <a href="{{ url('admin/register') }}"
-                        class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition">Choose
-                        Bronze</a>
-                </div>
-                <!-- Silver Plan -->
-                <div class="bg-white border-2 border-sky-200 p-8 rounded-2xl text-center">
-                    <h4 class="text-2xl font-bold mb-2 text-sky-700">Silver Plan</h4>
-                    <p class="mb-4 text-gray-600">For medium-sized clinics and growing practices</p>
-                    <ul class="mb-6 text-gray-700 space-y-2 text-left block">
-                        <li>All Bronze features</li>
-                        <li>Unlimited patients</li>
-                        <li>Advanced analytics & reports</li>
-                        <li>Prescription & billing module</li>
-                        <li>Multi-user roles & permissions</li>
-                        <li>Expanded storage (5–10 GB)</li>
-                        <li>Priority support</li>
-                    </ul>
-                    <a href="{{ url('admin/register') }}"
-                        class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition">Choose
-                        Silver</a>
-                </div>
-                <!-- Gold Plan -->
-                <div class="bg-white border-2 border-sky-200 p-8 rounded-2xl text-center">
-                    <h4 class="text-2xl font-bold mb-2 text-sky-700">Gold Plan</h4>
-                    <p class="mb-4 text-gray-600">For large medical centers and multi-branch businesses</p>
-                    <ul class="mb-6 text-gray-700 space-y-2 text-left block">
-                        <li>All Silver features</li>
-                        <li>Custom branding & domain</li>
-                        <li>API access for integrations</li>
-                        <li>Unlimited storage</li>
-                        <li>Advanced security & compliance (HIPAA/GDPR)</li>
-                        <li>AI-based patient insights & recommendations</li>
-                        <li>Dedicated account manager & 24/7 support</li>
-                    </ul>
-                    <a href="{{ url('admin/register') }}"
-                        class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition">Choose
-                        Gold</a>
-                </div>
+                @foreach ($plans as $plan)
+                    <div class="flex flex-col bg-white border-2 border-sky-200 p-8 rounded-2xl text-center">
+                        <h4 class="text-2xl font-bold mb-2 text-sky-700">{{ $plan->name }} Plan</h4>
+                        <p class="mb-4 text-gray-600">{{ $plan->description ?? '' }}</p>
+                        <ul class="mb-6 text-gray-700 space-y-2 text-left flex flex-col items-center">
+                            @foreach ($plan->features as $feature)
+                                <li>{{ $feature->name }}@if ($feature->value)
+                                        : <span class="font-semibold">{{ $feature->value }}</span>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                        <div class="flex-1"></div>
+                        <div class="mb-4 text-xl font-bold text-sky-700">${{ number_format($plan->price, 2) }} <span
+                                class="text-base font-normal text-gray-500">/ {{ $plan->billing_cycle }}</span></div>
+                        <a href="{{ url('admin/register') }}"
+                            class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition">Choose
+                            {{ $plan->name }}</a>
+                    </div>
+                @endforeach
             </div>
         </div>
         <!-- Custom Animations -->

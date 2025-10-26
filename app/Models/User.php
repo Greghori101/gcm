@@ -38,6 +38,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasName, H
         'gender',
         'email',
         'password',
+        'status',
     ];
 
     /**
@@ -74,6 +75,12 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasName, H
         return $this->hasOne(Patient::class);
     }
 
+
+    public function doctor()
+    {
+        return $this->hasOne(Doctor::class);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
@@ -96,5 +103,18 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasName, H
     public function avatar()
     {
         return $this->morphOne(Media::class, 'model')->where('collection_name', 'avatar');
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
+    }
+    public function currentPlan()
+    {
+        return $this->subscription?->plan;
+    }
+    public function hasFeature($featureName)
+    {
+        return $this->currentPlan()?->features()->where('name', $featureName)->exists();
     }
 }

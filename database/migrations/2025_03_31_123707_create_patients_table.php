@@ -12,8 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('patients', function (Blueprint $table) {
-            $table->uuid('id');
-            $table->json('conditions')->nullable();
+            $table->uuid('id')->primary()->unique();
+            $table->text('firstname');
+            $table->text('lastname');
+            $table->date('birthdate');
+            $table->text('phone_number')->unique();
+            $table->string('blood_type');
+            $table->string('gender');
+            $table->json('medical_history')->nullable();
             $table->foreignUuid('user_id')->nullable()->index();
             $table->timestamps();
         });

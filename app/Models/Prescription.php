@@ -15,6 +15,7 @@ class Prescription extends Model
         'date',
         'purpose',
         'diagnostic',
+        'patient_id',
     ];
     public function doctor()
     {
@@ -30,10 +31,9 @@ class Prescription extends Model
         return $this->morphOne(Address::class, 'addressable');
     }
 
-    public function  medicines()
+    public function medicines()
     {
         return $this->belongsToMany(Medicine::class, 'prescription_medicine')
-            ->using(PrescriptionMedicine::class)
             ->withPivot([
                 'is_qsp',
                 'quantity',
@@ -46,6 +46,7 @@ class Prescription extends Model
                 'conditions',
             ]);
     }
+
 
     public function prescriptionMedicines()
     {

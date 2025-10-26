@@ -18,6 +18,29 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
+        // Control which seeders to run
+        $runDatabaseSeeder = true;
+        $runPlansSeeder = true;
+        $runQueueSeeder = true;
+        $runMedicinesSeeder = true;
+        $runRolesPermissionsSeeder = true;
+
+        if ($runRolesPermissionsSeeder) {
+            $this->call(RoleWithPermissionsSeeder::class);
+        }
+        if ($runPlansSeeder) {
+            $this->call(DefaultPlansSeeder::class);
+        }
+        if ($runQueueSeeder) {
+            $this->call(QueueSeeder::class);
+        }
+        if ($runMedicinesSeeder) {
+            $this->call(MedicinesSeeder::class);
+        }
+        if (!$runDatabaseSeeder) {
+            return;
+        }
+
         $adminRole = Role::firstOrCreate(['name' => Roles::ADMIN->value]);
 
         // Create a default admin user
@@ -30,6 +53,7 @@ class DatabaseSeeder extends Seeder
                 'phone_number' => '[1234567899]',
                 'blood_type' => 'a+',
                 'gender' => 'male',
+                'status' => 'active',
                 'birthdate' => '2001-12-11',
                 'email_verified_at' => Carbon::now(),
             ]
@@ -52,6 +76,7 @@ class DatabaseSeeder extends Seeder
                 'phone_number' => '[1234567890]',
                 'blood_type' => 'a+',
                 'gender' => 'male',
+                'status' => 'active',
                 'birthdate' => '2001-12-11',
                 'email_verified_at' => Carbon::now(),
             ]
