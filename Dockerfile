@@ -3,25 +3,11 @@ FROM php:8.2-fpm
 # Set working directory
 WORKDIR /var/www/html
 
-# Install system dependencies and PHP extensions
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    nodejs \
-    npm \
-    netcat-traditional \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
+    git curl zip unzip libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libicu-dev \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install pdo pdo_mysql zip gd intl exif \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy Composer binary from official Composer image
