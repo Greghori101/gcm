@@ -2,9 +2,9 @@ FROM php:8.2-fpm
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip libpng-dev libjpeg-dev libfreetype6-dev libzip-dev \
+    git curl zip unzip libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libicu-dev \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install pdo pdo_mysql zip gd \
+    && docker-php-ext-install pdo pdo_mysql zip gd intl exif \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Redis extension
