@@ -7,6 +7,8 @@ WORKDIR /var/www/html
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libicu-dev \
     && docker-php-ext-configure zip \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
     && docker-php-ext-install pdo pdo_mysql zip gd intl exif \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
