@@ -1,33 +1,21 @@
 #!/bin/bash
 set -e
 
-# Ensure required directories exist
-mkdir -p /var/www/html/storage/framework/{cache,sessions,views}
-mkdir -p /var/www/html/storage/app/public
-mkdir -p /var/www/html/bootstrap/cache
+echo "Starting Laravel deployment script..."
 
-# Fix permissions
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Generate app key if missing
-if [ -z "$(grep '^APP_KEY=' .env | grep -v '=$')" ]; then
-    echo "Generating Laravel APP_KEY..."
-    php artisan key:generate
+# Run migrations safely
+if php artisan migrate:status > /dev/null 2>&1; then
+  echo "Running database migrations..."
+  php artisan migrate --force || echo "Migration skipped (already applied)"
+else
+  echo "Database connection not ready, skipping migrations"
 fi
 
-# Wait for database if DB_HOST is set
-if [ -n "$DB_HOST" ]; then
-    echo "Waiting for database connection at $DB_HOST..."
-    until nc -z -v -w30 $DB_HOST 3306; do
-        echo "Database not ready. Retrying in 5 seconds..."
-        sleep 5
-    done
-    echo "Database connected."
+# Cache configs and routes
+php artisan optimize
+php artisan filament:optimize || echo "Filament optimize skipped (if not installed)"
 
-    # Run migrations
-    php artisan migrate --force
-fi
+echo "Deployment optimization completed."
 
-# Execute container command (default: php-fpm)
+# Finally, run the default CMD
 exec "$@"

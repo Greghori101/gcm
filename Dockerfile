@@ -28,9 +28,6 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 # Build frontend assets
 RUN npm install && npm run build
 
-# Cache Laravel config and routes
-RUN php artisan config:clear && php artisan config:cache && php artisan route:cache
-
 # Fix storage and bootstrap/cache permissions
 RUN mkdir -p storage/framework/{cache,sessions,views} storage/app/public bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
@@ -41,4 +38,6 @@ EXPOSE 8080
 
 # Set entrypoint and default command
 ENTRYPOINT ["deploy.sh"]
-CMD ["php-fpm"]
+
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+
