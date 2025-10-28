@@ -25,13 +25,13 @@ COPY . .
 # Install PHP dependencies (no dev, no scripts for production)
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
-# Build frontend assets
-RUN npm install && npm run build
-
 # Fix storage and bootstrap/cache permissions
 RUN mkdir -p storage/framework/{cache,sessions,views} storage/app/public bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
+
+# Build frontend assets
+RUN npm install && npm run build
 
 # Expose FPM port
 EXPOSE 8080
